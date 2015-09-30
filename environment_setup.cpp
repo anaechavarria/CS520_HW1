@@ -54,6 +54,7 @@ void build_cell(int i, int j, int n, double p){
 	grid[i][j] = random_double() < p ? 1 : 0;
 
 	// If unblocked, add it to stack.
+	if (grid[i][j] == 0){ 
 		// Search for open neighbors.
 		int di[] = {+1, -1,  0,  0};
 		int dj[] = { 0,  0, +1, -1};
@@ -95,6 +96,7 @@ int main(){
 			// Start dfs on selected cell.
 			build_cell(start_i, start_j, grid_size, p);
 		}
-		print_grid(grid_size);
+		// Just print the first cell. TODO Save to a plain text file.
+		if (i == 0) print_grid(grid_size);
 	}
 }
