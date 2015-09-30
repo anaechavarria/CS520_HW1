@@ -50,19 +50,22 @@ void build_cell(int i, int j, int n, double p){
 	assert(*(it) == cur_cell);
 	open_cells.erase(it);
 
-	// Block cell with probabilty p.
+	// Block cell with probabilty p.	
 	grid[i][j] = random_double() < p ? 1 : 0;
 
-	// Search for open neighbors.
-	int di[] = {+1, -1,  0,  0};
-	int dj[] = { 0,  0, +1, -1};
-	for (int k = 0; k < 4; ++k){
-		int ni = i + di[k]; 
-		int nj = j + dj[k];
-		if (cell_open(ni, nj, n)){
-			build_cell(ni, nj, n, p);
+	// If unblocked, add it to stack.
+		// Search for open neighbors.
+		int di[] = {+1, -1,  0,  0};
+		int dj[] = { 0,  0, +1, -1};
+		for (int k = 0; k < 4; ++k){
+			int ni = i + di[k]; 
+			int nj = j + dj[k];
+			if (cell_open(ni, nj, n)){
+				build_cell(ni, nj, n, p);
+			}
 		}
 	}
+
 }
 
 void print_grid(int n){
