@@ -10,7 +10,10 @@ using namespace std;
 const int MAXN = 105;
 const int INF = 10000000;
 
+// Careful, do not change values.
+// Using memset to fill ints with UNEXPLORED and BLOCKED.
 enum { UNBLOCKED = 0, BLOCKED = 1, UNEXPLORED = -1};
+
 int explored_grid[MAXN][MAXN]; // The status of the grid explored so far.
 int actual_grid[MAXN][MAXN]; // The actual status of the grid.
 
@@ -54,10 +57,19 @@ int load_grid(string grid_path){
     return 5;
 }
 
-// TODO Implement.
+// Set the values of all the global variables before starting the search.
 void init_variables(string grid_path){
+    // Load grid and get grid size.
     n = load_grid(grid_path);
-
+    for (int i = 0; i < n; ++i){
+        for(int j = 0; j < n; ++j){
+            explored_grid[i][j] = UNEXPLORED;
+            g[i][j] = INF;
+            last_iter_searched[i][j] = 0;
+            tree[i][j] = make_pair(-1, -1);
+        }
+    }
+    closed.clear();
 }
 
 // TODO Implement.
@@ -68,6 +80,7 @@ void reset_variables(){
 
 // Test comparator function for running. TODO Delete.
 bool cmp(const cell &a, const cell &b){
+    if (a.f() == b.f()) return a.h < b.h;
     return a.f() > b.f();
 }
 
@@ -76,16 +89,21 @@ int get_h(int x0, int y0, int x1, int y1){
     return abs(x1 - x0) + abs(y1 - y0);
 }
 
+// Check if the inidices (i, j) are inside the grid.
+bool inside(int i, int j){
+    if (i < 0 or j < 0 or i >= n or j >= n) return false;
+    return true;
+}
+
 // Check if cell i, j is (presumably) unblocked. Indices can be out of bounds.
 bool unblocked(int i, int j){
     // If the indices are out of bounds.
-    if (i < 0 or j < 0 or i >= n or j >= n) return false;
+    if (!inside(i, j)) return false;
     // If the cell is blocked.
     if (explored_grid[i][j] == BLOCKED) return false;
     // The indices are in the bounds and the cell is either free or unexpolred.
     return true;
 }
-
 
 
 // Compute the shortest path from:
@@ -94,11 +112,10 @@ bool unblocked(int i, int j){
 // calling the function but is not neccesarily empty when returning.
 // Search count indicates the iteration number. Used to avoid refreshing the g
 // matrix for every cell.
+void compute_path(const int start_i, const int start_j,
+                  const int goal_i, const int goal_j, const int search_count){
 
-/*
-void compute_path(priority_queue<cell> &open,
-    const int start_i, const int start_j, const int goal_i, const int goal_j,
-    const int search_count){
+    priority_queue<cell, vector<cell>, decltype(&cmp)> open(&cmp);
 
     assert(open.empty());
 
@@ -110,6 +127,9 @@ void compute_path(priority_queue<cell> &open,
     while (!open.empty()){
         // Extract min from open.
         cell cur = open.top();
+
+        printf("Popping: "); cur.print();
+
         open.pop();
 
         // If this solution is worse than the best solution know to the goal.
@@ -135,25 +155,33 @@ void compute_path(priority_queue<cell> &open,
                 if (last_iter_searched[next_i][next_j] < search_count){
                     // Mark it as visited and reset the value of g.
                     g[next_i][next_j] = INF;
+            // printf("  Reseting (%d, %d)\n", next_i, next_j);
+    //      printf("  last_iter_searched = %d\n", last_iter_searched[next_i][next_j]);
                     last_iter_searched[next_i][next_j] = search_count;
+            // printf("  last_iter_searched = %d\n", last_iter_searched[next_i][next_j]);
                 }
                 int next_g = cur.g + 1;
                 int next_h = get_h(next_i, next_j, goal_i, goal_j);
                 // It the solution improves the best know solution
                 if (g[next_i][next_j] > next_g){
+
+            //printf("  g[%d][%d] = %d\n", next_i, next_j, g[next_i][next_j]);
                     // Update valuw of best know solution.
                     g[next_i][next_j] = next_g;
+
+            //printf("  g[%d][%d] = %d\n", next_i, next_j, g[next_i][next_j]);
                     // Udate tree.
                     tree[next_i][next_j] = make_pair(cur.i, cur.j);
                     // Add cell to open queue.
                     cell next = cell(next_i, next_j, next_g, next_h);
                     open.push(next);
+                    printf("  Pushing: "); next.print();
                 }
             }
         }
     }
 }
-*/
+
 
 // The comparator is the greater than comparator between cells.
 // Start position, Finish position, Tie breaking function, is it Adaptive,
@@ -184,10 +212,45 @@ void runr( function<bool (cell, cell)> comparator, int n){
 
 }
 
+void explore_neighbors(int i, int j){
+    assert(explored_grid[i][j] != UNEXPLORED);
 
+    int di[] = {+1, -1,  0,  0};
+    int dj[] = { 0,  0, +1, -1};
+    for (int k = 0; k < 4; ++k){
+        int next_i = i + di[k];
+        int next_j = j + dj[k];
+        if (inside(next_i, next_j)){
+            explored_grid[next_i][next_j] = actual_grid[next_i][next_j];
+            cout << (explored_grid[next_i][next_j] == BLOCKED) << endl;
+        }
+    }
+}
 
 
 int main(){
-    runr(&cmp, 8);
+    init_variables("asdf");
+    int x0 = 4, y0 = 2;
+    int x1 = 4, y1 = 4;
+    int search_count = 1;
+
+    g[x0][y0] = 0;
+
+    explored_grid[x0][y0] = actual_grid[x0][y0];
+    last_iter_searched[x0][y0] = last_iter_searched[x1][y1] = search_count;
+
+    explore_neighbors(x0, y0);
+
+    compute_path(x0, y0, x1, y1, search_count);
+
+    int cur_i = x1, cur_j = y1;
+    while(cur_i != -1){
+        int next_i = tree[cur_i][cur_j].first;
+        int next_j = tree[cur_i][cur_j].second;
+        printf("cur = (%d, %d)\n", cur_i, cur_j);
+        cur_i = next_i; cur_j = next_j;
+    }
+
+
     return 0;
 }
