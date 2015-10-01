@@ -18,25 +18,38 @@ struct cell{
     }
 };
 
-int n;
+const int MAXN = 105;
 const int INF = 10000000;
 
+enum { UNBLOCKED = 0, BLOCKED = 1, UNEXPLORED = -1};
+int explored_grid[MAXN][MAXN]; // The status of the grid explored so far.
+int actual_grid[MAXN][MAXN]; // The actual status of the grid.
+
+int g[MAXN][MAXN]; // The lowest known cost for the given cell.
+int search[MAXN][MAXN]; // The last iteration where the cell's cost was updated.
+
+set<pair<int, int> >; // The set of the cells that have been visited.
+pair <int, int> tree[MAXN][MAXN]; // The cell where we came from in the search.
+
+int n; // The size of the grid.
+
+// Test comparator function for running. TODO Delete.
 bool cmp(const cell &a, const cell &b){
     return a.f() > b.f();
 }
 
-// g[i][j] the known distance to cell i, j.
-// tree[i][j] = (k, l) of cell where I came from.
-// search[i][j] As described in the problem.
-// closed[i][j] As described in the problem.
 
 int get_h(int x0, int y0, int x1, int y1){
     return abs(x1 - x0) + abs(y1 - y0);
 }
 
-// Check if cell i, j is in the grid.
-bool inside(int i, int j){ // TODO Make n a global variable
+// Check if cell i, j is (presumably) unblocked. Indices can be out of bounds.
+bool unblocked(int i, int j){
+    // If the indices are out of bounds.
     if (i < 0 or j < 0 or i >= n or j >= n) return false;
+    // If the cell is blocked.
+    if (explored_grid[i][j] == BLOCKED) return false;
+    // The indices are in the bounds and the cell is either free or unexpolred.
     return true;
 }
 
@@ -44,8 +57,9 @@ void reset_variables(){
     // Reset variables. Reset tree. Reset array g to INF. Search matrix. closed.
 }
 
-void compute_path(priority_queue<cell> &open, const int start_i, const int start_j,
-        const int start_g, const int goal_i, const int goal_j, const int search_count){
+void compute_path(priority_queue<cell> &open, const int start_i,
+    const int start_j, const int start_g, const int goal_i, const int goal_j,
+    const int search_count){
     assert open.empty();
 
     int start_h = get_h(start_i, start_j, goal_i, goal_j);
@@ -58,13 +72,14 @@ void compute_path(priority_queue<cell> &open, const int start_i, const int start
         cell cur = open.top();
         open.pop();
         // If this solution is worse than the best solution know to the goal.
+        // Compare using f because f is the minimum possible cost to the goal.
         // Break because the answer is not going to improve.
-        if (cur.g() > g[goal_i][goal_i]) break;
+        if (g[goal_i][goal_j] <= cur.f()) break;
 
-        // If this solution doesn't improve the know soution of the given cell.
+        // If this solution doesn't improve the known soution of the given cell.
         // This is not in the pseudocode but is needed because we may have
         // several copies of the same cell in the queue.
-        if (cur.f() > g[cur.i][cur.j]) continue;
+        if (cur.g > g[cur.i][cur.j]) continue;
 
         closed[cur.i][cur.j] = true;
 
@@ -74,7 +89,7 @@ void compute_path(priority_queue<cell> &open, const int start_i, const int start
         for (int k = 0; k < 4; ++k){
             int next_i = cur.i + di[k];
             int next_j = cur.j + dj[k];
-            if (inside(next_i, next_j)){
+            if (unblocked(next_i, next_j)){
                 // If this cell has not been visited in this iteration.
                 if (search[next_i][next_j] < search_count){
                     // Mark it as visited and reset the value of g.
