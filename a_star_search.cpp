@@ -38,7 +38,7 @@ bool cmp(const cell &a, const cell &b){
     return a.f() > b.f();
 }
 
-
+// Returns the manhattan distance from cell (x0, y0) to cell (x1, y1).
 int get_h(int x0, int y0, int x1, int y1){
     return abs(x1 - x0) + abs(y1 - y0);
 }
@@ -53,17 +53,25 @@ bool unblocked(int i, int j){
     return true;
 }
 
+// TODO Implement.
 void reset_variables(){
     // Reset variables. Reset tree. Reset array g to INF. Search matrix. closed.
 }
 
-void compute_path(priority_queue<cell> &open, const int start_i,
-    const int start_j, const int start_g, const int goal_i, const int goal_j,
+// Compute the shortest path from:
+// cell (start_i, start_j) to cell (goal_i, goal_j)
+// Open is the pointer priority queue used for the search. It must be empty when
+// calling the function but is not neccesarily empty when returning.
+// Search count indicates the iteration number. Used to avoid refreshing the g
+// matrix for every cell.
+void compute_path(priority_queue<cell> &open,
+    const int start_i, const int start_j, const int goal_i, const int goal_j,
     const int search_count){
+
     assert open.empty();
 
     int start_h = get_h(start_i, start_j, goal_i, goal_j);
-    start_cell = cell(start_i, start_j, start_g, start_h);
+    start_cell = cell(start_i, start_j, 0, start_h);
 
     open.push(start_cell);
 
@@ -71,6 +79,7 @@ void compute_path(priority_queue<cell> &open, const int start_i,
         // Extract min from open.
         cell cur = open.top();
         open.pop();
+
         // If this solution is worse than the best solution know to the goal.
         // Compare using f because f is the minimum possible cost to the goal.
         // Break because the answer is not going to improve.
@@ -81,9 +90,9 @@ void compute_path(priority_queue<cell> &open, const int start_i,
         // several copies of the same cell in the queue.
         if (cur.g > g[cur.i][cur.j]) continue;
 
-        closed[cur.i][cur.j] = true;
+        closed.insert(make_pair(cur.i, cur.j));
 
-        // Move to the neighbors of i, j
+        // Move to the neighbors of cur
         int di[] = {+1, -1,  0,  0};
         int dj[] = { 0,  0, +1, -1};
         for (int k = 0; k < 4; ++k){
@@ -93,15 +102,15 @@ void compute_path(priority_queue<cell> &open, const int start_i,
                 // If this cell has not been visited in this iteration.
                 if (search[next_i][next_j] < search_count){
                     // Mark it as visited and reset the value of g.
-                    search[next_i][next_j] = search_count;
                     g[next_i][next_j] = INF;
+                    search[next_i][next_j] = search_count;
                 }
                 next_g = cur.g + 1;
                 next_h = get_h(next_i, next_j, goal_i, goal_j);
                 // It the solution improves the best know solution
-                if (g[next_i][next_j] > next_g + next_h){
+                if (g[next_i][next_j] > next_g){
                     // Update valuw of best know solution.
-                    g[next_i][next_j] = next_g + next_h;
+                    g[next_i][next_j] = next_g;
                     // Udate tree.
                     tree[next_i][next_j] = make_pair(cur.i, cur.j);
                     // Add cell to open queue.
