@@ -2,21 +2,10 @@
 #include <queue>
 #include <vector>
 #include <set>
+#include <string>
+#include <cassert>
 using namespace std;
 
-struct cell{
-    int i, j;
-    int g, h;
-
-    // Constructor for the cell class.
-    cell(int i, int j, int g, int h): i(i), j(j), g(g), h(h) {}
-
-    int f() const { return g + h; }
-
-    void print(){
-        printf("i = %d, j = %d, g = %d, h = %d,  f = %d\n", i, j, g, h, f());
-    }
-};
 
 const int MAXN = 105;
 const int INF = 10000000;
@@ -26,12 +15,56 @@ int explored_grid[MAXN][MAXN]; // The status of the grid explored so far.
 int actual_grid[MAXN][MAXN]; // The actual status of the grid.
 
 int g[MAXN][MAXN]; // The lowest known cost for the given cell.
-int search[MAXN][MAXN]; // The last iteration where the cell's cost was updated.
+int last_iter_searched[MAXN][MAXN]; // Last iter where the cost was updated.
 
-set<pair<int, int> >; // The set of the cells that have been visited.
+set<pair<int, int> > closed; // The set of the cells that have been visited.
 pair <int, int> tree[MAXN][MAXN]; // The cell where we came from in the search.
 
 int n; // The size of the grid.
+
+
+// The structure of each of the cells used in the priority_queue for the search.
+struct cell{
+    // The position of the cell in the grid.
+    int i, j;
+    // The assigned cost g and heuristic value h of the grid.
+    int g, h;
+
+    // Constructor for the cell class.
+    cell(int i, int j, int g, int h): i(i), j(j), g(g), h(h) {}
+
+    // Returns the value f = g + h of the grid.
+    int f() const { return g + h; }
+
+    // Prints the value of the grid.
+    void print(){
+        printf("cell(%d, %d), g = %d, h = %d,  f = %d\n", i, j, g, h, f());
+    }
+};
+
+// Loads the grid stored in the grid_path and stores it in the variable grid.
+// Returns n where n x n is the size of the grid.
+int load_grid(string grid_path){
+    // TODO Implement. Current is for testing only.
+    actual_grid[0][0] = actual_grid[0][1] = actual_grid[0][2] = actual_grid[0][3] = actual_grid[0][4] = 0;     // = {0, 0, 0, 0, 0};
+    actual_grid[1][0] = actual_grid[1][1] = actual_grid[1][3] = actual_grid[1][4] = 0;  actual_grid[1][2] = 1; // = {0, 0, 1, 0, 0};
+    actual_grid[2][0] = actual_grid[2][1] = actual_grid[2][4] = 0;  actual_grid[2][2] = actual_grid[2][3] = 1; // = {0, 0, 1, 1, 0};
+    actual_grid[3][0] = actual_grid[3][1] = actual_grid[3][4] = 0;  actual_grid[3][2] = actual_grid[3][3] = 1; // = {0, 0, 1, 1, 0};
+    actual_grid[4][0] = actual_grid[4][1] = actual_grid[4][2] = actual_grid[4][4] = 0;  actual_grid[4][3] = 1; // = {0, 0, 0, 1, 0};
+    return 5;
+}
+
+// TODO Implement.
+void init_variables(string grid_path){
+    n = load_grid(grid_path);
+
+}
+
+// TODO Implement.
+void reset_variables(){
+    // Reset variables. Reset tree. Reset array g to INF. Search matrix. closed.
+}
+
 
 // Test comparator function for running. TODO Delete.
 bool cmp(const cell &a, const cell &b){
@@ -53,10 +86,7 @@ bool unblocked(int i, int j){
     return true;
 }
 
-// TODO Implement.
-void reset_variables(){
-    // Reset variables. Reset tree. Reset array g to INF. Search matrix. closed.
-}
+
 
 // Compute the shortest path from:
 // cell (start_i, start_j) to cell (goal_i, goal_j)
@@ -64,14 +94,16 @@ void reset_variables(){
 // calling the function but is not neccesarily empty when returning.
 // Search count indicates the iteration number. Used to avoid refreshing the g
 // matrix for every cell.
+
+/*
 void compute_path(priority_queue<cell> &open,
     const int start_i, const int start_j, const int goal_i, const int goal_j,
     const int search_count){
 
-    assert open.empty();
+    assert(open.empty());
 
     int start_h = get_h(start_i, start_j, goal_i, goal_j);
-    start_cell = cell(start_i, start_j, 0, start_h);
+    cell start_cell = cell(start_i, start_j, 0, start_h);
 
     open.push(start_cell);
 
@@ -100,13 +132,13 @@ void compute_path(priority_queue<cell> &open,
             int next_j = cur.j + dj[k];
             if (unblocked(next_i, next_j)){
                 // If this cell has not been visited in this iteration.
-                if (search[next_i][next_j] < search_count){
+                if (last_iter_searched[next_i][next_j] < search_count){
                     // Mark it as visited and reset the value of g.
                     g[next_i][next_j] = INF;
-                    search[next_i][next_j] = search_count;
+                    last_iter_searched[next_i][next_j] = search_count;
                 }
-                next_g = cur.g + 1;
-                next_h = get_h(next_i, next_j, goal_i, goal_j);
+                int next_g = cur.g + 1;
+                int next_h = get_h(next_i, next_j, goal_i, goal_j);
                 // It the solution improves the best know solution
                 if (g[next_i][next_j] > next_g){
                     // Update valuw of best know solution.
@@ -121,27 +153,34 @@ void compute_path(priority_queue<cell> &open,
         }
     }
 }
+*/
 
 // The comparator is the greater than comparator between cells.
 // Start position, Finish position, Tie breaking function, is it Adaptive,
 // Grid size
-void run(function<bool (cell, cell)> comparator, int n){
-    // Heap for open cells.
-    priority_queue<cell, vector<cell>, decltype(&comparator)> open(&comparator);
-    // Vector
-    set<cell> closed;
+void runr( function<bool (cell, cell)> comparator, int n){
+    //function<bool (cell, cell)> comparator
+    // bool (*comparator)(*cell, *cell)
 
-    open.push(cell(0, 1));
-    cell c = open.top(); c.print();
-    open.push(cell(-1, 4));
-    c = open.top(); c.print();
+    // // Heap for open cells.
+    //priority_queue<cell, vector<cell>, decltype(&comparator)> open(&comparator);
 
-    open.push(cell(81, 4));
-    c = open.top(); c.print();
-    open.push(cell(-81, 4));
-    c = open.top(); c.print();
-    open.pop();
-    c = open.top(); c.print();
+    // // Vector
+    // set<cell> closed;
+
+    // priority_queue<cell, vector<cell>, decltype(&cmp)> open(&cmp);
+
+    // open.push(cell(0, 1, 1, 1));
+    // cell c = open.top(); c.print();
+    // open.push(cell(7, 7, -1, 4));
+    // c = open.top(); c.print();
+
+    // open.push(cell(7, 7, 81, 4));
+    // c = open.top(); c.print();
+    // open.push(cell(-100, 100, -81, 4));
+    // c = open.top(); c.print();
+    // open.pop();
+    // c = open.top(); c.print();
 
 }
 
@@ -149,6 +188,6 @@ void run(function<bool (cell, cell)> comparator, int n){
 
 
 int main(){
-
+    runr(&cmp, 8);
     return 0;
 }
