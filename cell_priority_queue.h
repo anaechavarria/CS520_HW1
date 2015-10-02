@@ -36,6 +36,8 @@ class PriorityQueue
         void push(cell);
         // Pop the smallest element from the queue and return it.
         cell pop();
+        // True iff the queue has no elements.
+        bool empty();
 
     private:
         // The maximum size of the queue.

@@ -88,3 +88,8 @@ cell PriorityQueue::pop(){
 bool PriorityQueue::compare(cell a, cell b){
     return comp(a, b);
 }
+
+bool PriorityQueue::empty(){
+    assert(size >= 0);
+    return size == 0;
+}
