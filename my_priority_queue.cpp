@@ -27,20 +27,16 @@ struct cell{
 };
 
 
+// The class that represents the priority queue.
 class PriorityQueue
 {
    public:
+        // Constructor using the less than compare function.
         PriorityQueue(function<bool (cell, cell)> comparator);
-
-        int parent(int);
-        int left_child(int);
-        int right_child(int);
-
-        bool compare(cell, cell);
-
+        // Push the given cell to the queue.
         void push(cell);
+        // Pop the smallest element from the queue and return it.
         cell pop();
-        cell top();
 
     private:
         // The maximum size of the queue.
@@ -51,6 +47,15 @@ class PriorityQueue
         cell tree[MAX_SIZE];
         // The number of elements in the queue.
         int size;
+
+        // Get the index of the parent of the node at the given index.
+        int parent(int);
+        // Get the index of the left child of the node at the given index.
+        int left_child(int);
+        // Get the index of the right child of the node at the given index.
+        int right_child(int);
+        // Calls comp on the input and returns whatever it returns.
+        bool compare(cell, cell);
 };
 
 // Constructor using the comparator function as a parameter.
@@ -75,6 +80,7 @@ int PriorityQueue::right_child(int index){
     return 2* index + 2;
 }
 
+// Push the given cell to the queue.
 void PriorityQueue::push(cell c){
     assert(size < MAX_SIZE);
     // Insert in the last position and increment the size.
@@ -88,6 +94,7 @@ void PriorityQueue::push(cell c){
     }
 }
 
+// Pop the smallest element from the queue and return it.
 cell PriorityQueue::pop(){
     assert(size > 0);
 
@@ -112,6 +119,8 @@ cell PriorityQueue::pop(){
         // If right child is less than best seen cell.
         if (right < size and comp(tree[right], tree[min_index])) min_index = right;
 
+        // If the parent is greater than its smallest child, swap and recurr.
+        // Otherwise stop because the tree is balanced.
         if (min_index != i){
             swapped = true;
             swap(tree[i], tree[min_index]);
@@ -127,15 +136,11 @@ cell PriorityQueue::pop(){
     return popped_cell;
 }
 
-cell PriorityQueue::top(){
-    assert(size > 0);
-    return tree[0];
-}
-
 // True iff cell a is less than cell b using the compare function of the class.
 bool PriorityQueue::compare(cell a, cell b){
     return comp(a, b);
 }
+
 
 
 // True iff cell a is less than cell b.
