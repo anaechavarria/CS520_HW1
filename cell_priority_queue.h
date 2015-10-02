@@ -1,8 +1,7 @@
-#include <string>
 using namespace std;
 
-#ifndef __X_H_INCLUDED__   // if x.h hasn't been included yet...
-#define __X_H_INCLUDED__   //   #define this so the compiler knows it has been included
+#ifndef __P_QUEUE_H_INCLUDED__ // If this file hasn't been included yet.
+#define __P_QUEUE_H_INCLUDED__ // Let the compiler know it has been included.
 
 // The structure of each of the cells used in the priority queue.
 struct cell{
@@ -33,7 +32,6 @@ class PriorityQueue
    public:
         // Constructor using the less than compare function.
         PriorityQueue(function<bool (cell, cell)> comparator);
-        // PriorityQueue(string);
         // Push the given cell to the queue.
         void push(cell);
         // Pop the smallest element from the queue and return it.
@@ -59,10 +57,4 @@ class PriorityQueue
         bool compare(cell, cell);
 };
 
-
-// bool cmp_larger_g(const cell, const cell);
-// bool cmp_smaller_g(const cell, const cell);
-
 #endif
-
-
