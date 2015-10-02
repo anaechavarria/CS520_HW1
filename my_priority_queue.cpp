@@ -1,68 +1,26 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
+#include <string>
+#include "my_priority_queue.h"
 
 using namespace std;
 
-// The structure of each of the cells used in the priority queue.
-struct cell{
-    // The position of the cell in the grid.
-    int i, j;
-    // The assigned cost g and heuristic value h of the grid.
-    int g, h;
 
-    // Constructor for the cell class.
-    cell(int i, int j, int g, int h): i(i), j(j), g(g), h(h) {}
-
-    // Empty contructor to be able to create arrays of cells.
-    cell(){}
-
-    // Returns the value f = g + h of the grid.
-    int f() const { return g + h; }
-
-    // Prints the value of the grid.
-    void print(){
-        printf("cell(%d, %d), g = %d, h = %d,  f = %d\n", i, j, g, h, f());
-    }
-};
-
-
-// The class that represents the priority queue.
-class PriorityQueue
-{
-   public:
-        // Constructor using the less than compare function.
-        PriorityQueue(function<bool (cell, cell)> comparator);
-        // Push the given cell to the queue.
-        void push(cell);
-        // Pop the smallest element from the queue and return it.
-        cell pop();
-
-    private:
-        // The maximum size of the queue.
-        static const int MAX_SIZE = 315 * 315;
-        // Returns true iff cell a is less than cell b.
-        function<bool (cell, cell)> comp;
-        // The binary tree that represents the queue.
-        cell tree[MAX_SIZE];
-        // The number of elements in the queue.
-        int size;
-
-        // Get the index of the parent of the node at the given index.
-        int parent(int);
-        // Get the index of the left child of the node at the given index.
-        int left_child(int);
-        // Get the index of the right child of the node at the given index.
-        int right_child(int);
-        // Calls comp on the input and returns whatever it returns.
-        bool compare(cell, cell);
-};
-
-// Constructor using the comparator function as a parameter.
+// // Constructor using the comparator function as a parameter.
 PriorityQueue::PriorityQueue(function<bool (cell, cell)> comparator){
-    comp = comparator;
     size = 0;
+    comp = comparator;
 }
+
+
+// Constructor using the string of the type of compare function as a parameter.
+// PriorityQueue::PriorityQueue(string comparator_type){
+//     size = 0;
+//     if (comparator_type == "smaller_g") comp = cmp_smaller_g;
+//     else if (comparator_type == "larger_g") comp = cmp_smaller_g;
+//     else assert(false);
+// }
 
 // Get the index of the parent of the node at the given index.
 // Note: parent(0) = 0 for all others, parent(i) < i.
@@ -142,7 +100,6 @@ bool PriorityQueue::compare(cell a, cell b){
 }
 
 
-
 // True iff cell a is less than cell b.
 // Break ties in favor of the cell with the smaller g value.
 bool cmp_smaller_g(const cell &a, const cell &b){
@@ -165,8 +122,9 @@ int main(){
     int c = ++a;
     cout << a << " " << c << endl;
 
-    PriorityQueue q1 = PriorityQueue(cmp_smaller_g);
-    PriorityQueue q2 = PriorityQueue(cmp_larger_g);
+    // string ssss = "smaller_g";
+    // PriorityQueue q1 = PriorityQueue(ssss);
+    PriorityQueue q1 = PriorityQueue(cmp_larger_g);
 
     cell c1 = cell(0, 1, -3, 0);
     cell c1_1 = cell(0, 1, 5, 0);
@@ -244,3 +202,4 @@ int main(){
     // c = open.top(); c.print();
 
 }
+
