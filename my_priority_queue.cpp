@@ -44,26 +44,35 @@ bool PriorityQueue::compare(cell a, cell b){
     return comp(a, b);
 }
 
-// Test comparator function for running. TODO Delete.
-bool cmp(const cell &a, const cell &b){
-    if (a.f() == b.f()) return a.h < b.h;
+// True iff cell a is less than cell b.
+// Break ties in favor of the cell with the smaller g value.
+bool cmp_smaller_g(const cell &a, const cell &b){
+    if (a.f() == b.f()) return a.g < b.g;
+    return a.f() > b.f();
+}
+
+// True iff cell a is less than cell b.
+// Break ties in favor of the cell with the larger g value.
+bool cmp_larger_g(const cell &a, const cell &b){
+    if (a.f() == b.f()) return a.g > b.g;
     return a.f() > b.f();
 }
 
 
 int main(){
 
-    PriorityQueue q = PriorityQueue(cmp);
+    PriorityQueue q1 = PriorityQueue(cmp_smaller_g);
+    PriorityQueue q2 = PriorityQueue(cmp_larger_g);
 
     cell c1 = cell(0, 1, 1, 1);
     cell c2 = cell(0, 1, 1, 1);
-    cell c3 = cell(0, 1, -1, 1);
-    cell c4 = cell(0, 1, -1, -1);
+    cell c3 = cell(0, 1, 1, -1);
+    cell c4 = cell(0, 1, -1, 1);
 
-    cout << q.compare(c1, c2) << endl;
-    cout << q.compare(c2, c1) << endl;
-    cout << q.compare(c1, c3) << endl;
-    cout << q.compare(c3, c4) << endl;
+    cout << q1.compare(c1, c2) << " " << q2.compare(c1, c2) << endl;
+    cout << q1.compare(c2, c1) << " " << q2.compare(c2, c1) << endl;
+    cout << q1.compare(c1, c3) << " " << q2.compare(c1, c3) << endl;
+    cout << q1.compare(c3, c4) << " " << q2.compare(c3, c4) << endl;
 
         //function<bool (cell, cell)> comparator
     // bool (*comparator)(*cell, *cell)
