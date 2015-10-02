@@ -26,25 +26,6 @@ pair <int, int> tree[MAXN][MAXN]; // The cell where we came from in the search.
 int n; // The size of the grid.
 
 
-// The structure of each of the cells used in the priority_queue for the search.
-struct cell{
-    // The position of the cell in the grid.
-    int i, j;
-    // The assigned cost g and heuristic value h of the grid.
-    int g, h;
-
-    // Constructor for the cell class.
-    cell(int i, int j, int g, int h): i(i), j(j), g(g), h(h) {}
-
-    // Returns the value f = g + h of the grid.
-    int f() const { return g + h; }
-
-    // Prints the value of the grid.
-    void print(){
-        printf("cell(%d, %d), g = %d, h = %d,  f = %d\n", i, j, g, h, f());
-    }
-};
-
 // Loads the grid stored in the grid_path and stores it in the variable grid.
 // Returns n where n x n is the size of the grid.
 int load_grid(string grid_path){
