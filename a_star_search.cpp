@@ -56,17 +56,22 @@ void init_variables(string grid_path, int &x0, int &y0, int &x1, int &y1){
     for (int i = 0; i < n; ++i){
         for(int j = 0; j < n; ++j){
             explored_grid[i][j] = UNEXPLORED;
-            g[i][j] = INF;
             last_iter_searched[i][j] = 0;
-            tree[i][j] = make_pair(-1, -1);
         }
     }
     closed.clear();
 }
 
-// TODO Implement.
-void reset_variables(){
-    // Reset variables. Reset tree. Reset array g to INF. Search matrix. closed.
+// Reset the variables in between searches.
+void reset_variables(int start_i, int start_j){
+    closed.clear();
+    for (int i = 0; i < n; ++i){
+        for(int j = 0; j < n; ++j){
+            g[i][j] = INF;
+            tree[i][j] = make_pair(-1, -1);
+        }
+    }
+    g[start_i][start_j] = 0;
 }
 
 
@@ -209,21 +214,25 @@ int main(){
     int x0, y0, x1, y1;
     init_variables("test_input/test_00.in", x0, y0, x1, y1);
 
-    int search_count = 1;
-
-    g[x0][y0] = 0;
-
+    // The agent know the cell it is in and its neighboring cells.
     explored_grid[x0][y0] = actual_grid[x0][y0];
-    last_iter_searched[x0][y0] = last_iter_searched[x1][y1] = search_count;
-
     explore_neighbors(x0, y0);
 
-    PriorityQueue open = PriorityQueue(cmp_smaller_g);
-    compute_path(open, x0, y0, x1, y1, search_count);
+    for (int search_count = 1; (x0 != x1) or (y0 != y1); search_count++){
+        reset_variables(x0, y0);
 
-    vector<pair<int, int> > path = get_path(x1, y1);
-    for (int i = 0; i < path.size(); ++i) printf("(%d, %d) ", path[i].first, path[i].second);
-    printf("\n");
+        last_iter_searched[x0][y0] = last_iter_searched[x1][y1] = search_count;
+
+        PriorityQueue open = PriorityQueue(cmp_smaller_g);
+        assert(open.empty() and closed.empty());
+        compute_path(open, x0, y0, x1, y1, search_count);
+
+        vector<pair<int, int> > path = get_path(x1, y1);
+        for (int i = 0; i < path.size(); ++i) printf("(%d, %d) ", path[i].first, path[i].second);
+        printf("\n");
+        break;
+    }
+
 
 
     return 0;
