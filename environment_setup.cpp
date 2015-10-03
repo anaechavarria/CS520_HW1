@@ -174,7 +174,7 @@ int main(){
         // Write standard output to grid file.
         char filename[50];
         sprintf(filename, "input/grid_%02d.in", i + 1);
-        freopen(filename,"w",stdout);
+        freopen(filename, "w", stdout);
 
 
         reset_variables(grid_size);

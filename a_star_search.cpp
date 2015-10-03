@@ -1,5 +1,7 @@
 #include <iostream>
+#include <cstdio>
 #include <set>
+#include <vector>
 #include <string>
 #include <cassert>
 #include "cell_priority_queue.h"
@@ -26,20 +28,31 @@ int n; // The size of the grid.
 
 // Loads the grid stored in the grid_path and stores it in the variable grid.
 // Returns n where n x n is the size of the grid.
-int load_grid(string grid_path){
-    // TODO Implement. Current is for testing only.
-    actual_grid[0][0] = actual_grid[0][1] = actual_grid[0][2] = actual_grid[0][3] = actual_grid[0][4] = 0;     // = {0, 0, 0, 0, 0};
-    actual_grid[1][0] = actual_grid[1][1] = actual_grid[1][3] = actual_grid[1][4] = 0;  actual_grid[1][2] = 1; // = {0, 0, 1, 0, 0};
-    actual_grid[2][0] = actual_grid[2][1] = actual_grid[2][4] = 0;  actual_grid[2][2] = actual_grid[2][3] = 1; // = {0, 0, 1, 1, 0};
-    actual_grid[3][0] = actual_grid[3][1] = actual_grid[3][4] = 0;  actual_grid[3][2] = actual_grid[3][3] = 1; // = {0, 0, 1, 1, 0};
-    actual_grid[4][0] = actual_grid[4][1] = actual_grid[4][2] = actual_grid[4][4] = 0;  actual_grid[4][3] = 1; // = {0, 0, 0, 1, 0};
-    return 5;
+int load_grid(string grid_path, int &x0, int &y0, int &x1, int &y1){
+    freopen(grid_path.c_str(), "r", stdin);
+
+    int grid_size;
+
+    cin >> grid_size;
+    cin >> x0 >> y0 >> x1 >> y1;
+
+    for (int i = 0; i < grid_size; ++i){
+        string line; cin >> line; cout << line << endl;
+        assert (line.size() == grid_size);
+        for (int j = 0; j < grid_size; ++j){
+            if (line[j] == '.') actual_grid[i][j] = UNBLOCKED;
+            else if (line[j] == '#') actual_grid[i][j] = BLOCKED;
+            else assert(false);
+        }
+    }
+    return grid_size;
 }
 
 // Set the values of all the global variables before starting the search.
-void init_variables(string grid_path){
+void init_variables(string grid_path, int &x0, int &y0, int &x1, int &y1){
     // Load grid and get grid size.
-    n = load_grid(grid_path);
+    n = load_grid(grid_path, x0, y0, x1, y1);
+
     for (int i = 0; i < n; ++i){
         for(int j = 0; j < n; ++j){
             explored_grid[i][j] = UNEXPLORED;
@@ -146,36 +159,6 @@ void compute_path(PriorityQueue &open, const int start_i, const int start_j,
     }
 }
 
-
-// The comparator is the greater than comparator between cells.
-// Start position, Finish position, Tie breaking function, is it Adaptive,
-// Grid size
-void runr( function<bool (cell, cell)> comparator, int n){
-    //function<bool (cell, cell)> comparator
-    // bool (*comparator)(*cell, *cell)
-
-    // // Heap for open cells.
-    //priority_queue<cell, vector<cell>, decltype(&comparator)> open(&comparator);
-
-    // // Vector
-    // set<cell> closed;
-
-    // priority_queue<cell, vector<cell>, decltype(&cmp)> open(&cmp);
-
-    // open.push(cell(0, 1, 1, 1));
-    // cell c = open.top(); c.print();
-    // open.push(cell(7, 7, -1, 4));
-    // c = open.top(); c.print();
-
-    // open.push(cell(7, 7, 81, 4));
-    // c = open.top(); c.print();
-    // open.push(cell(-100, 100, -81, 4));
-    // c = open.top(); c.print();
-    // open.pop();
-    // c = open.top(); c.print();
-
-}
-
 void explore_neighbors(int i, int j){
     assert(explored_grid[i][j] != UNEXPLORED);
 
@@ -191,8 +174,21 @@ void explore_neighbors(int i, int j){
     }
 }
 
+// Get the path from the start cell to cell (goal_i, goal_j)
+vector<pair<int, int> > get_path(int goal_i, int goal_j){
+    vector<pair<int, int> > path;
 
+    int cur_i = goal_i, cur_j = goal_j;
+    while(cur_i != -1){ // Iterate until the current cell has no parent.
+        path.push_back(make_pair(cur_i, cur_j));
 
+        int next_i = tree[cur_i][cur_j].first;
+        int next_j = tree[cur_i][cur_j].second;
+        cur_i = next_i; cur_j = next_j;
+    }
+    reverse(path.begin(), path.end());
+    return path;
+}
 
 // True iff cell a is less than cell b.
 // Break ties in favor of the cell with the smaller g value.
@@ -210,9 +206,9 @@ bool cmp_larger_g(const cell &a, const cell &b){
 
 
 int main(){
-    init_variables("asdf");
-    int x0 = 4, y0 = 2;
-    int x1 = 4, y1 = 4;
+    int x0, y0, x1, y1;
+    init_variables("test_input/test_00.in", x0, y0, x1, y1);
+
     int search_count = 1;
 
     g[x0][y0] = 0;
@@ -225,13 +221,9 @@ int main(){
     PriorityQueue open = PriorityQueue(cmp_smaller_g);
     compute_path(open, x0, y0, x1, y1, search_count);
 
-    int cur_i = x1, cur_j = y1;
-    while(cur_i != -1){
-        int next_i = tree[cur_i][cur_j].first;
-        int next_j = tree[cur_i][cur_j].second;
-        printf("cur = (%d, %d)\n", cur_i, cur_j);
-        cur_i = next_i; cur_j = next_j;
-    }
+    vector<pair<int, int> > path = get_path(x1, y1);
+    for (int i = 0; i < path.size(); ++i) printf("(%d, %d) ", path[i].first, path[i].second);
+    printf("\n");
 
 
     return 0;
