@@ -105,13 +105,18 @@ void build_cell(const int i, const int j, const int n){
                 }
             }
             build_cell(next_i, next_j, n);
+
+            // Randlomly block the cell to create separate components.
+            if ((rand() % 8) == 0) grid[next_i][next_j] = BLOCKED;
         }else{
-            // Mark the next two cells as blocked.
+            // Mark the next two cells as blocked with some random probability.
             if (cell_open(next_i, next_j, n)){
                 grid[next_i][next_j] = BLOCKED;
             }
             if (cell_open(inter_i, inter_j, n)){
-                grid[inter_i][inter_j] = BLOCKED;
+                // Randomly mark unblocked to create loops.
+                if ((rand() % 5) == 0) grid[inter_i][inter_j] = UNBLOCKED;
+                else grid[inter_i][inter_j] = BLOCKED;
             }
         }
     }
@@ -131,7 +136,7 @@ void print_grid(int n){
 
 int main(){
     int num_gridworlds = 3;
-    int grid_size = 10;
+    int grid_size = 15;
 
     for (int i = 0; i <  num_gridworlds; ++i){
         reset_variables(grid_size);
@@ -141,10 +146,16 @@ int main(){
             pair<int, int> start_cell = open_cells[start_index];
             int start_i = start_cell.first;
             int start_j = start_cell.second;
-            // Start dfs on selected cell.
+
             remove_cell_from_open_list(start_i, start_j, grid_size);
-            grid[start_i][start_j] = UNBLOCKED;
-            build_cell(start_i, start_j, grid_size);
+
+            // Randomly start a grid from there or mark it as blocked.
+            //if ((rand() % 5) == 0){
+                grid[start_i][start_j] = UNBLOCKED;
+                build_cell(start_i, start_j, grid_size);
+            //}else{
+                grid[start_i][start_j] = BLOCKED;
+            //}
         }
         // Just print the first cell. TODO Save to a plain text file.
         print_grid(grid_size);
