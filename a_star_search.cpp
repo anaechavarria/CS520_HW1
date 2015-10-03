@@ -58,12 +58,6 @@ void reset_variables(){
 }
 
 
-// Test comparator function for running. TODO Delete.
-bool cmp(const cell &a, const cell &b){
-    if (a.f() == b.f()) return a.h < b.h;
-    return a.f() > b.f();
-}
-
 // Returns the manhattan distance from cell (x0, y0) to cell (x1, y1).
 int get_h(int x0, int y0, int x1, int y1){
     return abs(x1 - x0) + abs(y1 - y0);
@@ -88,7 +82,7 @@ bool unblocked(int i, int j){
 
 // Compute the shortest path from:
 // cell (start_i, start_j) to cell (goal_i, goal_j)
-// TODO Change comment. Open is the pointer priority queue used for the search. It must be empty when
+// Open is the pointer priority queue used for the search. It must be empty when
 // calling the function but is not neccesarily empty when returning.
 // Search count indicates the iteration number. Used to avoid refreshing the g
 // matrix for every cell.
@@ -131,21 +125,16 @@ void compute_path(PriorityQueue &open, const int start_i, const int start_j,
                 if (last_iter_searched[next_i][next_j] < search_count){
                     // Mark it as visited and reset the value of g.
                     g[next_i][next_j] = INF;
-            // printf("  Reseting (%d, %d)\n", next_i, next_j);
-    //      printf("  last_iter_searched = %d\n", last_iter_searched[next_i][next_j]);
                     last_iter_searched[next_i][next_j] = search_count;
-            // printf("  last_iter_searched = %d\n", last_iter_searched[next_i][next_j]);
                 }
                 int next_g = cur.g + 1;
                 int next_h = get_h(next_i, next_j, goal_i, goal_j);
                 // It the solution improves the best know solution
                 if (g[next_i][next_j] > next_g){
 
-            //printf("  g[%d][%d] = %d\n", next_i, next_j, g[next_i][next_j]);
                     // Update valuw of best know solution.
                     g[next_i][next_j] = next_g;
 
-            //printf("  g[%d][%d] = %d\n", next_i, next_j, g[next_i][next_j]);
                     // Udate tree.
                     tree[next_i][next_j] = make_pair(cur.i, cur.j);
                     // Add cell to open queue.
