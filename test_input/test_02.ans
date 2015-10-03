@@ -1,0 +1,24 @@
+5
+4 0 3 4
+.##.#
+...##
+.#...
+...#.
+.####
+
+First path
+	(4, 0) (3, 0) (3, 1) (3, 2) (3, 3) (3, 4)
+	Walk until (3, 2)
+Second path
+	(3, 2) (2, 2) (2, 3) (2, 4) (3, 4)
+	Path found
+
+
+Computer output:
+
+(4, 0) (3, 0) (3, 1) (3, 2) (3, 3) (3, 4)
+Walked until (3, 2)
+(3, 2) (2, 2) (2, 3) (2, 4) (3, 4)
+Walked until (3, 4)
+Goal reached!
+

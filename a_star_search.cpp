@@ -230,7 +230,7 @@ bool cmp_larger_g(const cell &a, const cell &b){
 
 int main(){
     int i0, j0, i1, j1;
-    init_variables("test_input/test_00.in", i0, j0, i1, j1);
+    init_variables("test_input/test_04.in", i0, j0, i1, j1);
 
     // The agent know the cell it is in and its neighboring cells.
     explored_grid[i0][j0] = actual_grid[i0][j0];
