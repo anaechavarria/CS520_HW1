@@ -116,7 +116,7 @@ void build_cell(const int i, const int j){
             build_cell(next_i, next_j);
 
             // Randlomly block the neighbor cell to create separate components.
-            if ((rand() % 6) == 0) grid[next_i][next_j] = BLOCKED;
+            if ((rand() % 5) == 0) grid[next_i][next_j] = BLOCKED;
         }else{ // At least one of the cells nor open.
             if (cell_open(next_i, next_j)){
                 grid[next_i][next_j] = BLOCKED;
