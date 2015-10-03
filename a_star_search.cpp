@@ -174,7 +174,6 @@ void explore_neighbors(int i, int j){
         int next_j = j + dj[k];
         if (inside(next_i, next_j)){
             explored_grid[next_i][next_j] = actual_grid[next_i][next_j];
-            cout << (explored_grid[next_i][next_j] == BLOCKED) << endl;
         }
     }
 }
@@ -195,6 +194,25 @@ vector<pair<int, int> > get_path(int goal_i, int goal_j){
     return path;
 }
 
+// Walk along the given path of cells and explore the grid as you go.
+// If the path is blocked, stop the walk.
+// Return the last cell in the path that could be visited.
+pair<int, int> walk_path(vector< pair<int,int> > path){
+    for (int k = 0; k < path.size(); ++k){
+        int i = path[k].first;
+        int j = path[k].second;
+
+        if (actual_grid[i][j] == BLOCKED){
+            // We could at least visit the first cell in the path.
+            assert(k > 0);
+            assert(explored_grid[i][j] = BLOCKED);
+            return path[k - 1];
+        }
+        explored_grid[i][j] = actual_grid[i][j];
+        explore_neighbors(i, j);
+    }
+    return path.back();
+}
 // True iff cell a is less than cell b.
 // Break ties in favor of the cell with the smaller g value.
 bool cmp_smaller_g(const cell &a, const cell &b){
@@ -212,7 +230,7 @@ bool cmp_larger_g(const cell &a, const cell &b){
 
 int main(){
     int i0, j0, i1, j1;
-    init_variables("test_input/test_04.in", i0, j0, i1, j1);
+    init_variables("test_input/test_00.in", i0, j0, i1, j1);
 
     // The agent know the cell it is in and its neighboring cells.
     explored_grid[i0][j0] = actual_grid[i0][j0];
@@ -228,18 +246,21 @@ int main(){
         compute_path(open, i0, j0, i1, j1, search_count);
 
         // Could never get to the goal cell.
-        if (tree[i1][j1] == make_pair(-1, -1)){
-            // TODO make it return an empty path.
-            printf("Cannot reach target.\n");
-            break;
-        }
+        if (tree[i1][j1] == make_pair(-1, -1)) break;
 
         vector<pair<int, int> > path = get_path(i1, j1);
         for (int i = 0; i < path.size(); ++i) printf("(%d, %d) ", path[i].first, path[i].second);
         printf("\n");
-        break;
+        pair<int, int> last_walked_cell = walk_path(path);
+        printf("Walked until (%d, %d)\n", last_walked_cell.first, last_walked_cell.second);
+        i0 = last_walked_cell.first; j0 = last_walked_cell.second;
     }
 
+    if ((i0 == i1) and (j0 == j1)){
+        printf("Goal reached!\n");
+    }else{
+        printf("There is no path\n");
+    }
 
 
     return 0;
