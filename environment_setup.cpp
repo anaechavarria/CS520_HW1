@@ -1,6 +1,6 @@
 #include <iostream>
-#include <fstream>
 #include <vector>
+#include <cstdio>
 #include <cstring>
 #include <cassert>
 #include <iterator>
@@ -116,7 +116,7 @@ void build_cell(const int i, const int j){
             build_cell(next_i, next_j);
 
             // Randlomly block the neighbor cell to create separate components.
-            if ((rand() % 5) == 0) grid[next_i][next_j] = BLOCKED;
+            if ((rand() % 20) == 0) grid[next_i][next_j] = BLOCKED;
         }else{ // At least one of the cells nor open.
             if (cell_open(next_i, next_j)){
                 grid[next_i][next_j] = BLOCKED;
@@ -130,13 +130,32 @@ void build_cell(const int i, const int j){
     }
 }
 
+// After generating the grid, select a random open cell from it.
+pair<int, int> random_open_cell(){
+    int i, j;
+    do {
+        i = rand() % n;
+        j = rand() % n;
+    } while(grid[i][j] != UNBLOCKED);
+    return make_pair(i, j);
+}
 
 // Print the grid in a readable format.
 void print_grid(){
+    // Select two random open cells for the start and the target.
+    pair<int, int> start_cell = random_open_cell();
+    pair<int, int> target_cell = random_open_cell();
+
+    // First line is the size of the grid.
+    printf("%d\n", n);
+    // Second line are the start and target cells.
+    printf("%d %d %d %d\n", start_cell.first, start_cell.second,
+        target_cell.first, target_cell.second);
+    // The next lines are the grid.
     for (int i = 0; i < n; ++i){
         for (int j = 0; j < n; ++j){
-            if (grid[i][j] == UNBLOCKED) printf(". ");
-            else if (grid[i][j] == BLOCKED) printf("# ");
+            if (grid[i][j] == UNBLOCKED) printf(".");
+            else if (grid[i][j] == BLOCKED) printf("#");
             else assert(false);
         }
         printf("\n");
@@ -146,10 +165,18 @@ void print_grid(){
 
 
 int main(){
-    int num_gridworlds = 3;
-    int grid_size = 20;
+    // The number of mazes to generate.
+    int num_gridworlds = 50;
+    // The size of each grid.
+    int grid_size = 101;
 
     for (int i = 0; i <  num_gridworlds; ++i){
+        // Write standard output to grid file.
+        char filename[50];
+        sprintf(filename, "input/grid_%02d.in", i + 1);
+        freopen(filename,"w",stdout);
+
+
         reset_variables(grid_size);
         while(!open_cells.empty()){
             // Chose a random cell in open_cells.
@@ -157,12 +184,12 @@ int main(){
             pair<int, int> start_cell = open_cells[start_index];
             int start_i = start_cell.first;
             int start_j = start_cell.second;
-
+            // Start DFS from selected cell.
             remove_cell_from_open_list(start_i, start_j);
             grid[start_i][start_j] = UNBLOCKED;
             build_cell(start_i, start_j);
         }
-        // Just print the first cell. TODO Save to a plain text file.
+        // Print the grid and two random cells to start the search from.
         print_grid();
     }
 }
