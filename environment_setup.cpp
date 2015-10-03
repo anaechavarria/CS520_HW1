@@ -7,13 +7,20 @@
 using namespace std;
 
 const int MAXN = 105; // Maximum grid length.
-int grid[MAXN][MAXN]; // -1 not visited, 0 blank, 1 blocked.
+
+// Careful not to change the value of NOT_VISITED since we are using memeset to
+// set the cells initially which does it by bytes (-1 = 1111 1111 ... 1111).
+enum { UNBLOCKED = 0, BLOCKED = 1, NOT_VISITED = -1};
+
+int grid[MAXN][MAXN]; // The resulting grid
 vector< pair<int, int> > open_cells; // Ordered set of unvisited cells.
 
 // Reset the values of the global variables to start a new grid.
 void reset_variables(int n){
-    // Reset the grid. Set all cells to -1.
-    memset(grid, -1, sizeof(grid));
+    // Reset the grid. Set all cells to not visited.
+    // Not visited must be an integer that has all the 8 bytes the same for this
+    // statement to work properly.
+    memset(grid, NOT_VISITED, sizeof(grid));
     // Add all cells as open_cells.
     open_cells.clear();
     for (int i = 0; i < n; ++i){
@@ -33,13 +40,10 @@ double random_double(){
 // Check if cell i, j is unvisited. Also works with indices out of bounds.
 bool cell_open(int i, int j, int n){
     if (i < 0 or j < 0 or i >= n or j >= n) return false;
-    return grid[i][j] == -1;
+    return grid[i][j] == NOT_VISITED;
 }
 
-// Decide the value of cell (i, j) and use DFS to set the value of the
-// neighboring cells.
-// The grid has size n x n and p is the probabilty that cell (i, j) is blocked.
-void build_cell(int i, int j, int n, double p){
+void remove_cell_from_open_list(int i, int j, int n){
     // Cell i, j must be unvisited.
     assert(cell_open(i, j, n));
     // Look for the position of the element (i, j) in the unvisited list.
@@ -49,27 +53,53 @@ void build_cell(int i, int j, int n, double p){
     // Erase (i, j) from unvisited list.
     assert(*(it) == cur_cell);
     open_cells.erase(it);
+}
 
-    // Block cell with probabilty p.
-    grid[i][j] = random_double() < p ? 1 : 0;
+// TODO: Change comments.
+// Decide the value of cell (i, j) and use DFS to set the value of the
+// neighboring cells.
+// The grid has size n x n and p is the probabilty that cell (i, j) is blocked.
+void build_cell(const int i, const int j, const int n){
+    assert(grid[i][j] == UNBLOCKED);
 
-    // If unblocked, add it to stack.
-    if (grid[i][j] == 0){
-        // Search for open neighbors.
-        int di[] = {+1, -1,  0,  0};
-        int dj[] = { 0,  0, +1, -1};
-        for (int k = 0; k < 4; ++k){
-            int ni = i + di[k];
-            int nj = j + dj[k];
-            if (cell_open(ni, nj, n)){
-                build_cell(ni, nj, n, p);
+    // Search for neighbors.
+    vector<pair<int, int> > open_neighbors;
+    int di[] = {+2, -2,  0,  0};
+    int dj[] = { 0,  0, +2, -2};
+    for (int k = 0; k < 4; ++k){
+        // The next cell tht is two cells away.
+        int next_i = i + di[k];
+        int next_j = j + dj[k];
+
+        open_neighbors.push_back(make_pair(next_i, next_j));
+    }
+    // Make a random order of the neighbors.
+    random_shuffle(open_neighbors.begin(), open_neighbors.end());
+
+    // Recurr on the neighbors in a random order.
+    for (int k = 0; k < 4; ++k){
+        int next_i = open_neighbors[k].first;
+        int next_j = open_neighbors[k].second;
+        int inter_i = (i + next_i) / 2;
+        int inter_j = (j + next_j) / 2;
+        if (cell_open(next_i, next_j, n)){
+            if (cell_open(inter_i, inter_j, n)){
+                // Mark the next two cell as unblocked and recurr.
+                remove_cell_from_open_list(next_i, next_j, n);
+                remove_cell_from_open_list(inter_i, inter_j, n);
+                grid[next_i][next_j] = grid[inter_i][inter_j] = UNBLOCKED;
+                build_cell(next_i, next_j, n);
             }
+        }else if (cell_open(inter_i, inter_j, n)){
+                // Mark the intermediate cell as blocked.
+                remove_cell_from_open_list(inter_i, inter_j, n);
+                grid[inter_i][inter_j] = BLOCKED;
         }
     }
-
 }
 
 void print_grid(int n){
+    printf("\n\n");
     for (int i = 0; i < n; ++i){
         for (int j = 0; j < n; ++j){
             if (grid[i][j] == 0) printf(".");
@@ -78,12 +108,12 @@ void print_grid(int n){
         }
         printf("\n");
     }
+    printf("\n\n");
 }
 
 int main(){
-    int num_gridworlds = 50;
-    int grid_size = 101;
-    double p = 0.3;
+    int num_gridworlds = 3;
+    int grid_size = 5;
 
     for (int i = 0; i <  num_gridworlds; ++i){
         reset_variables(grid_size);
@@ -94,9 +124,11 @@ int main(){
             int start_i = start_cell.first;
             int start_j = start_cell.second;
             // Start dfs on selected cell.
-            build_cell(start_i, start_j, grid_size, p);
+            remove_cell_from_open_list(start_i, start_j, grid_size);
+            grid[start_i][start_j] = UNBLOCKED;
+            build_cell(start_i, start_j, grid_size);
         }
         // Just print the first cell. TODO Save to a plain text file.
-        if (i == 0) print_grid(grid_size);
+        print_grid(grid_size);
     }
 }
