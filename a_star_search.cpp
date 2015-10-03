@@ -1,9 +1,8 @@
 #include <iostream>
-#include <queue>
-#include <vector>
 #include <set>
 #include <string>
 #include <cassert>
+#include "cell_priority_queue.h"
 using namespace std;
 
 
@@ -25,25 +24,6 @@ pair <int, int> tree[MAXN][MAXN]; // The cell where we came from in the search.
 
 int n; // The size of the grid.
 
-
-// The structure of each of the cells used in the priority_queue for the search.
-struct cell{
-    // The position of the cell in the grid.
-    int i, j;
-    // The assigned cost g and heuristic value h of the grid.
-    int g, h;
-
-    // Constructor for the cell class.
-    cell(int i, int j, int g, int h): i(i), j(j), g(g), h(h) {}
-
-    // Returns the value f = g + h of the grid.
-    int f() const { return g + h; }
-
-    // Prints the value of the grid.
-    void print(){
-        printf("cell(%d, %d), g = %d, h = %d,  f = %d\n", i, j, g, h, f());
-    }
-};
 
 // Loads the grid stored in the grid_path and stores it in the variable grid.
 // Returns n where n x n is the size of the grid.
@@ -78,12 +58,6 @@ void reset_variables(){
 }
 
 
-// Test comparator function for running. TODO Delete.
-bool cmp(const cell &a, const cell &b){
-    if (a.f() == b.f()) return a.h < b.h;
-    return a.f() > b.f();
-}
-
 // Returns the manhattan distance from cell (x0, y0) to cell (x1, y1).
 int get_h(int x0, int y0, int x1, int y1){
     return abs(x1 - x0) + abs(y1 - y0);
@@ -112,10 +86,8 @@ bool unblocked(int i, int j){
 // calling the function but is not neccesarily empty when returning.
 // Search count indicates the iteration number. Used to avoid refreshing the g
 // matrix for every cell.
-void compute_path(const int start_i, const int start_j,
+void compute_path(PriorityQueue &open, const int start_i, const int start_j,
                   const int goal_i, const int goal_j, const int search_count){
-
-    priority_queue<cell, vector<cell>, decltype(&cmp)> open(&cmp);
 
     assert(open.empty());
 
@@ -126,11 +98,9 @@ void compute_path(const int start_i, const int start_j,
 
     while (!open.empty()){
         // Extract min from open.
-        cell cur = open.top();
+        cell cur = open.pop();
 
         printf("Popping: "); cur.print();
-
-        open.pop();
 
         // If this solution is worse than the best solution know to the goal.
         // Compare using f because f is the minimum possible cost to the goal.
@@ -155,21 +125,16 @@ void compute_path(const int start_i, const int start_j,
                 if (last_iter_searched[next_i][next_j] < search_count){
                     // Mark it as visited and reset the value of g.
                     g[next_i][next_j] = INF;
-            // printf("  Reseting (%d, %d)\n", next_i, next_j);
-    //      printf("  last_iter_searched = %d\n", last_iter_searched[next_i][next_j]);
                     last_iter_searched[next_i][next_j] = search_count;
-            // printf("  last_iter_searched = %d\n", last_iter_searched[next_i][next_j]);
                 }
                 int next_g = cur.g + 1;
                 int next_h = get_h(next_i, next_j, goal_i, goal_j);
                 // It the solution improves the best know solution
                 if (g[next_i][next_j] > next_g){
 
-            //printf("  g[%d][%d] = %d\n", next_i, next_j, g[next_i][next_j]);
                     // Update valuw of best know solution.
                     g[next_i][next_j] = next_g;
 
-            //printf("  g[%d][%d] = %d\n", next_i, next_j, g[next_i][next_j]);
                     // Udate tree.
                     tree[next_i][next_j] = make_pair(cur.i, cur.j);
                     // Add cell to open queue.
@@ -228,6 +193,23 @@ void explore_neighbors(int i, int j){
 }
 
 
+
+
+// True iff cell a is less than cell b.
+// Break ties in favor of the cell with the smaller g value.
+bool cmp_smaller_g(const cell &a, const cell &b){
+    if (a.f() == b.f()) return a.g < b.g;
+    return a.f() < b.f();
+}
+
+// True iff cell a is less than cell b.
+// Break ties in favor of the cell with the larger g value.
+bool cmp_larger_g(const cell &a, const cell &b){
+    if (a.f() == b.f()) return a.g > b.g;
+    return a.f() < b.f();
+}
+
+
 int main(){
     init_variables("asdf");
     int x0 = 4, y0 = 2;
@@ -241,7 +223,8 @@ int main(){
 
     explore_neighbors(x0, y0);
 
-    compute_path(x0, y0, x1, y1, search_count);
+    PriorityQueue open = PriorityQueue(cmp_smaller_g);
+    compute_path(open, x0, y0, x1, y1, search_count);
 
     int cur_i = x1, cur_j = y1;
     while(cur_i != -1){
