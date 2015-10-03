@@ -40,6 +40,13 @@ void PriorityQueue::push(cell c){
         swap(tree[i], tree[parent(i)]);
         i = parent(i);
     }
+
+    // TODO Remove this code for final set up.
+    // printf("Tree after push: ");
+    // for (int j = 0; j < size; ++j){
+    //     printf("%d ", tree[j].f());
+    // }
+    // printf("\n");
 }
 
 // Pop the smallest element from the queue and return it.
@@ -76,10 +83,12 @@ cell PriorityQueue::pop(){
         }
     } while(swapped);
 
-    for (int j = 0; j < size; ++j){
-        printf("%d ", tree[j].f());
-    }
-    printf("\n");
+    // TODO Remove this code for final set up.
+    // printf("Tree after pop: ");
+    // for (int j = 0; j < size; ++j){
+    //     printf("%d ", tree[j].f());
+    // }
+    // printf("\n");
 
     return popped_cell;
 }
