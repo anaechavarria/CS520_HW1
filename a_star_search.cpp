@@ -9,8 +9,7 @@ using namespace std;
 const int MAXN = 105;
 const int INF = 10000000;
 
-// Careful, do not change values.
-// Using memset to fill ints with UNEXPLORED and BLOCKED.
+// The possible values for the cells in the grid.
 enum { UNBLOCKED = 0, BLOCKED = 1, UNEXPLORED = -1};
 
 int explored_grid[MAXN][MAXN]; // The status of the grid explored so far.
