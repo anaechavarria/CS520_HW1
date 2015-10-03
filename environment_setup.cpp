@@ -37,9 +37,15 @@ double random_double(){
     return ((double)rand() / (double)(RAND_MAX));
 }
 
+// Checks if the cell i, j is inside the bounds of the grid.
+bool inside(int i, int j, int n){
+    if (i < 0 or j < 0 or i >= n or j >= n) return false;
+    return true;
+}
+
 // Check if cell i, j is unvisited. Also works with indices out of bounds.
 bool cell_open(int i, int j, int n){
-    if (i < 0 or j < 0 or i >= n or j >= n) return false;
+    if (!inside(i, j, n)) return false;
     return grid[i][j] == NOT_VISITED;
 }
 
@@ -63,57 +69,69 @@ void build_cell(const int i, const int j, const int n){
     assert(grid[i][j] == UNBLOCKED);
 
     // Search for neighbors.
-    vector<pair<int, int> > open_neighbors;
+    vector<pair<int, int> > neighbors;
     int di[] = {+2, -2,  0,  0};
     int dj[] = { 0,  0, +2, -2};
     for (int k = 0; k < 4; ++k){
         // The next cell tht is two cells away.
         int next_i = i + di[k];
         int next_j = j + dj[k];
-
-        open_neighbors.push_back(make_pair(next_i, next_j));
+        neighbors.push_back(make_pair(next_i, next_j));
     }
     // Make a random order of the neighbors.
-    random_shuffle(open_neighbors.begin(), open_neighbors.end());
+    random_shuffle(neighbors.begin(), neighbors.end());
 
     // Recurr on the neighbors in a random order.
-    for (int k = 0; k < 4; ++k){
-        int next_i = open_neighbors[k].first;
-        int next_j = open_neighbors[k].second;
+    for (int k = 0; k < neighbors.size(); ++k){
+
+        int next_i = neighbors[k].first;
+        int next_j = neighbors[k].second;
         int inter_i = (i + next_i) / 2;
         int inter_j = (j + next_j) / 2;
-        if (cell_open(next_i, next_j, n)){
-            if (cell_open(inter_i, inter_j, n)){
-                // Mark the next two cell as unblocked and recurr.
-                remove_cell_from_open_list(next_i, next_j, n);
-                remove_cell_from_open_list(inter_i, inter_j, n);
-                grid[next_i][next_j] = grid[inter_i][inter_j] = UNBLOCKED;
-                build_cell(next_i, next_j, n);
+
+        if (cell_open(next_i, next_j, n)) remove_cell_from_open_list(next_i, next_j, n);
+        if (cell_open(inter_i, inter_j, n)) remove_cell_from_open_list(inter_i, inter_j, n);
+
+        if (cell_open(next_i, next_j, n) and cell_open(inter_i, inter_j, n)){
+            // Mark the next two cell as unblocked.
+            grid[next_i][next_j] = grid[inter_i][inter_j] = UNBLOCKED;
+            // Mark the neigbors of the intermediate cell as blocked.
+            for (int l = 0; l < 4; ++l){
+                int inter_neigh_i = inter_i + di[l] / 2;
+                int inter_neigh_j = inter_j + dj[l] / 2;
+                if (cell_open(inter_neigh_i, inter_neigh_j, n)){
+                    remove_cell_from_open_list(inter_neigh_i, inter_neigh_j, n);
+                    grid[inter_neigh_i][inter_neigh_j] = BLOCKED;
+                }
             }
-        }else if (cell_open(inter_i, inter_j, n)){
-                // Mark the intermediate cell as blocked.
-                remove_cell_from_open_list(inter_i, inter_j, n);
+            build_cell(next_i, next_j, n);
+        }else{
+            // Mark the next two cells as blocked.
+            if (cell_open(next_i, next_j, n)){
+                grid[next_i][next_j] = BLOCKED;
+            }
+            if (cell_open(inter_i, inter_j, n)){
                 grid[inter_i][inter_j] = BLOCKED;
+            }
         }
     }
 }
 
 void print_grid(int n){
-    printf("\n\n");
     for (int i = 0; i < n; ++i){
         for (int j = 0; j < n; ++j){
-            if (grid[i][j] == 0) printf(".");
-            else if (grid[i][j] == 1) printf("#");
+            if (grid[i][j] == UNBLOCKED) printf(". ");
+            else if (grid[i][j] == BLOCKED) printf("# ");
             else assert(false);
         }
         printf("\n");
     }
-    printf("\n\n");
+    printf("\n");
 }
 
 int main(){
     int num_gridworlds = 3;
-    int grid_size = 5;
+    int grid_size = 10;
 
     for (int i = 0; i <  num_gridworlds; ++i){
         reset_variables(grid_size);
