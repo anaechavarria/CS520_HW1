@@ -211,23 +211,30 @@ bool cmp_larger_g(const cell &a, const cell &b){
 
 
 int main(){
-    int x0, y0, x1, y1;
-    init_variables("test_input/test_00.in", x0, y0, x1, y1);
+    int i0, j0, i1, j1;
+    init_variables("test_input/test_04.in", i0, j0, i1, j1);
 
     // The agent know the cell it is in and its neighboring cells.
-    explored_grid[x0][y0] = actual_grid[x0][y0];
-    explore_neighbors(x0, y0);
+    explored_grid[i0][j0] = actual_grid[i0][j0];
+    explore_neighbors(i0, j0);
 
-    for (int search_count = 1; (x0 != x1) or (y0 != y1); search_count++){
-        reset_variables(x0, y0);
+    for (int search_count = 1; (i0 != i1) or (j0 != j1); search_count++){
+        reset_variables(i0, j0);
 
-        last_iter_searched[x0][y0] = last_iter_searched[x1][y1] = search_count;
+        last_iter_searched[i0][j0] = last_iter_searched[i1][j1] = search_count;
 
         PriorityQueue open = PriorityQueue(cmp_smaller_g);
         assert(open.empty() and closed.empty());
-        compute_path(open, x0, y0, x1, y1, search_count);
+        compute_path(open, i0, j0, i1, j1, search_count);
 
-        vector<pair<int, int> > path = get_path(x1, y1);
+        // Could never get to the goal cell.
+        if (tree[i1][j1] == make_pair(-1, -1)){
+            // TODO make it return an empty path.
+            printf("Cannot reach target.\n");
+            break;
+        }
+
+        vector<pair<int, int> > path = get_path(i1, j1);
         for (int i = 0; i < path.size(); ++i) printf("(%d, %d) ", path[i].first, path[i].second);
         printf("\n");
         break;
