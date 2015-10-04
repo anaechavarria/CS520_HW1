@@ -4,10 +4,10 @@
 #include <vector>
 #include <string>
 #include <cassert>
-#include "cell_priority_queue.h"
+#include "a_star_search.h"
 using namespace std;
 
-#define debug true
+#define debug false
 
 const int MAXN = 105;
 const int INF = 10000000;
@@ -219,21 +219,6 @@ pair<int, int> walk_path(vector< pair<int,int> > path){
     return path.back();
 }
 
-// True iff cell a is less than cell b.
-// Break ties in favor of the cell with the smaller g value.
-bool cmp_smaller_g(const cell &a, const cell &b){
-    if (a.f() == b.f()) return a.g < b.g;
-    return a.f() < b.f();
-}
-
-// True iff cell a is less than cell b.
-// Break ties in favor of the cell with the larger g value.
-bool cmp_larger_g(const cell &a, const cell &b){
-    if (a.f() == b.f()) return a.g > b.g;
-    return a.f() < b.f();
-}
-
-
 // Return true iff the goal cell can be reached from the start cell.
 bool run_search(string grid_path, function<bool (cell, cell)> cmp){
     // Load the grid.
@@ -272,13 +257,4 @@ bool run_search(string grid_path, function<bool (cell, cell)> cmp){
     // Goal cell could be reached.
     assert ((i0 == i1) and (j0 == j1));
     return true;
-}
-
-int main(){
-
-
-    if (run_search("test_input/test_05.in", cmp_smaller_g)) printf("Goal reached!\n");
-    else printf("There is no path\n");
-
-    return 0;
 }
