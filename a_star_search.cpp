@@ -7,6 +7,7 @@
 #include "cell_priority_queue.h"
 using namespace std;
 
+#define debug true
 
 const int MAXN = 105;
 const int INF = 10000000;
@@ -28,16 +29,18 @@ int n; // The size of the grid.
 
 // Loads the grid stored in the grid_path and stores it in the variable grid.
 // Returns n where n x n is the size of the grid.
-int load_grid(string grid_path, int &x0, int &y0, int &x1, int &y1){
+// The values (i0, j0) will the inicial cell to start the search.
+// The values (i1, j1) will the goal cell for the search.
+int load_grid(string grid_path, int &i0, int &j0, int &i1, int &j1){
     freopen(grid_path.c_str(), "r", stdin);
 
     int grid_size;
 
     cin >> grid_size;
-    cin >> x0 >> y0 >> x1 >> y1;
+    cin >> i0 >> j0 >> i1 >> j1;
 
     for (int i = 0; i < grid_size; ++i){
-        string line; cin >> line; cout << line << endl;
+        string line; cin >> line;
         assert (line.size() == grid_size);
         for (int j = 0; j < grid_size; ++j){
             if (line[j] == '.') actual_grid[i][j] = UNBLOCKED;
@@ -49,9 +52,9 @@ int load_grid(string grid_path, int &x0, int &y0, int &x1, int &y1){
 }
 
 // Set the values of all the global variables before starting the search.
-void init_variables(string grid_path, int &x0, int &y0, int &x1, int &y1){
+void init_variables(string grid_path, int &i0, int &j0, int &i1, int &j1){
     // Load grid and get grid size.
-    n = load_grid(grid_path, x0, y0, x1, y1);
+    n = load_grid(grid_path, i0, j0, i1, j1);
 
     for (int i = 0; i < n; ++i){
         for(int j = 0; j < n; ++j){
@@ -75,9 +78,9 @@ void reset_variables(int start_i, int start_j){
 }
 
 
-// Returns the manhattan distance from cell (x0, y0) to cell (x1, y1).
-int get_h(int x0, int y0, int x1, int y1){
-    return abs(x1 - x0) + abs(y1 - y0);
+// Returns the manhattan distance from cell (i0, j0) to cell (i1, j1).
+int get_h(int i0, int j0, int i1, int j1){
+    return abs(i1 - i0) + abs(j1 - j0);
 }
 
 // Check if the inidices (i, j) are inside the grid.
@@ -117,7 +120,7 @@ void compute_path(PriorityQueue &open, const int start_i, const int start_j,
         // Extract min from open.
         cell cur = open.pop();
 
-        printf("Popping: "); cur.print();
+        if (debug){ printf("Popping: "); cur.print(); }
 
         // If this solution is worse than the best solution know to the goal.
         // Compare using f because f is the minimum possible cost to the goal.
@@ -157,13 +160,15 @@ void compute_path(PriorityQueue &open, const int start_i, const int start_j,
                     // Add cell to open queue.
                     cell next = cell(next_i, next_j, next_g, next_h);
                     open.push(next);
-                    printf("  Pushing: "); next.print();
+                    if (debug){ printf("  Pushing: "); next.print(); }
                 }
             }
         }
     }
 }
 
+// Explore the neighbors of the cell (i, j). It updates the values of the
+// neighbors in the explored grid to match the values in the actual grid.
 void explore_neighbors(int i, int j){
     assert(explored_grid[i][j] != UNEXPLORED);
 
@@ -213,6 +218,7 @@ pair<int, int> walk_path(vector< pair<int,int> > path){
     }
     return path.back();
 }
+
 // True iff cell a is less than cell b.
 // Break ties in favor of the cell with the smaller g value.
 bool cmp_smaller_g(const cell &a, const cell &b){
@@ -228,9 +234,11 @@ bool cmp_larger_g(const cell &a, const cell &b){
 }
 
 
-int main(){
+// Return true iff the goal cell can be reached from the start cell.
+bool run_search(string grid_path, function<bool (cell, cell)> cmp){
+    // Load the grid.
     int i0, j0, i1, j1;
-    init_variables("test_input/test_04.in", i0, j0, i1, j1);
+    init_variables(grid_path, i0, j0, i1, j1);
 
     // The agent know the cell it is in and its neighboring cells.
     explored_grid[i0][j0] = actual_grid[i0][j0];
@@ -241,27 +249,36 @@ int main(){
 
         last_iter_searched[i0][j0] = last_iter_searched[i1][j1] = search_count;
 
-        PriorityQueue open = PriorityQueue(cmp_smaller_g);
+        PriorityQueue open = PriorityQueue(cmp);
         assert(open.empty() and closed.empty());
+
         compute_path(open, i0, j0, i1, j1, search_count);
 
         // Could never get to the goal cell.
-        if (tree[i1][j1] == make_pair(-1, -1)) break;
+        if (tree[i1][j1] == make_pair(-1, -1)) return false;
 
         vector<pair<int, int> > path = get_path(i1, j1);
-        for (int i = 0; i < path.size(); ++i) printf("(%d, %d) ", path[i].first, path[i].second);
-        printf("\n");
         pair<int, int> last_walked_cell = walk_path(path);
-        printf("Walked until (%d, %d)\n", last_walked_cell.first, last_walked_cell.second);
         i0 = last_walked_cell.first; j0 = last_walked_cell.second;
-    }
 
-    if ((i0 == i1) and (j0 == j1)){
-        printf("Goal reached!\n");
-    }else{
-        printf("There is no path\n");
+        if (debug){
+            for (int i = 0; i < path.size(); ++i){
+                printf("(%d, %d) ", path[i].first, path[i].second);
+            }
+            printf("\n");
+            printf("Walked until (%d, %d)\n", i0, j0);
+        }
     }
+    // Goal cell could be reached.
+    assert ((i0 == i1) and (j0 == j1));
+    return true;
+}
 
+int main(){
+
+
+    if (run_search("test_input/test_05.in", cmp_smaller_g)) printf("Goal reached!\n");
+    else printf("There is no path\n");
 
     return 0;
 }
