@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <cassert>
+#include <iterator>
 #include "a_star_search.h"
 using namespace std;
 
@@ -19,6 +20,7 @@ int explored_grid[MAXN][MAXN]; // The status of the grid explored so far.
 int actual_grid[MAXN][MAXN]; // The actual status of the grid.
 
 int g[MAXN][MAXN]; // The lowest known cost for the given cell.
+int h[MAXN][MAXN]; // The value of h for each of the cells.
 int last_iter_searched[MAXN][MAXN]; // Last iter where the cost was updated.
 
 set<pair<int, int> > closed; // The set of the cells that have been visited.
@@ -26,6 +28,27 @@ pair <int, int> tree[MAXN][MAXN]; // The cell where we came from in the search.
 
 int n; // The size of the grid.
 
+
+// Returns the manhattan distance from cell (i0, j0) to cell (i1, j1).
+int manhattan_distance(int i0, int j0, int i1, int j1){
+    return abs(i1 - i0) + abs(j1 - j0);
+}
+
+// Check if the inidices (i, j) are inside the grid.
+bool inside(int i, int j){
+    if (i < 0 or j < 0 or i >= n or j >= n) return false;
+    return true;
+}
+
+// Check if cell i, j is (presumably) unblocked. Indices can be out of bounds.
+bool unblocked(int i, int j){
+    // If the indices are out of bounds.
+    if (!inside(i, j)) return false;
+    // If the cell is blocked.
+    if (explored_grid[i][j] == BLOCKED) return false;
+    // The indices are in the bounds and the cell is either free or unexpolred.
+    return true;
+}
 
 // Loads the grid stored in the grid_path and stores it in the variable grid.
 // Returns n where n x n is the size of the grid.
@@ -58,8 +81,9 @@ void init_variables(string grid_path, int &i0, int &j0, int &i1, int &j1){
 
     for (int i = 0; i < n; ++i){
         for(int j = 0; j < n; ++j){
-            explored_grid[i][j] = UNEXPLORED;
-            last_iter_searched[i][j] = 0;
+            explored_grid[i][j] = UNEXPLORED; // None of the cells are explored.
+            last_iter_searched[i][j] = 0; // No cell has been searched yet.
+            h[i][j] = manhattan_distance(i, j, i1, j1); // The value of h.
         }
     }
     closed.clear();
@@ -77,29 +101,6 @@ void reset_variables(int start_i, int start_j){
     g[start_i][start_j] = 0;
 }
 
-
-// Returns the manhattan distance from cell (i0, j0) to cell (i1, j1).
-int get_h(int i0, int j0, int i1, int j1){
-    return abs(i1 - i0) + abs(j1 - j0);
-}
-
-// Check if the inidices (i, j) are inside the grid.
-bool inside(int i, int j){
-    if (i < 0 or j < 0 or i >= n or j >= n) return false;
-    return true;
-}
-
-// Check if cell i, j is (presumably) unblocked. Indices can be out of bounds.
-bool unblocked(int i, int j){
-    // If the indices are out of bounds.
-    if (!inside(i, j)) return false;
-    // If the cell is blocked.
-    if (explored_grid[i][j] == BLOCKED) return false;
-    // The indices are in the bounds and the cell is either free or unexpolred.
-    return true;
-}
-
-
 // Compute the shortest path from:
 // cell (start_i, start_j) to cell (goal_i, goal_j)
 // Open is the pointer priority queue used for the search. It must be empty when
@@ -111,7 +112,7 @@ void compute_path(PriorityQueue &open, const int start_i, const int start_j,
 
     assert(open.empty());
 
-    int start_h = get_h(start_i, start_j, goal_i, goal_j);
+    int start_h = h[start_i][start_j];
     cell start_cell = cell(start_i, start_j, 0, start_h);
 
     open.push(start_cell);
@@ -148,7 +149,7 @@ void compute_path(PriorityQueue &open, const int start_i, const int start_j,
                     last_iter_searched[next_i][next_j] = search_count;
                 }
                 int next_g = cur.g + 1;
-                int next_h = get_h(next_i, next_j, goal_i, goal_j);
+                int next_h = h[next_i][next_j];
                 // It the solution improves the best know solution
                 if (g[next_i][next_j] > next_g){
 
@@ -166,6 +167,17 @@ void compute_path(PriorityQueue &open, const int start_i, const int start_j,
         }
     }
 }
+
+// Update the values of h to be h(s) = g(goal) - g(s) if s was a closed cell.
+// (i1, j1) are the coordinates of the goal cell.
+void update_h(int i1, int j1){
+    for (set<pair<int, int> >::iterator it = closed.begin(); it != closed.end(); ++it){
+        int i = it->first;
+        int j = it->second;
+        h[i][j] = g[i1][j1] - g[i][j];;
+    }
+}
+
 
 // Explore the neighbors of the cell (i, j). It updates the values of the
 // neighbors in the explored grid to match the values in the actual grid.
@@ -220,7 +232,10 @@ pair<int, int> walk_path(vector< pair<int,int> > path){
 }
 
 // Return true iff the goal cell can be reached from the start cell.
-bool run_search(string grid_path, function<bool (cell, cell)> cmp){
+// grid_path: is the path of the input grid (and start and target cells).
+// cmp: is the cell comparison function to use.
+// adaptive: is true iff the search is an adaptive A* search.
+bool run_search(string grid_path, function<bool (cell, cell)> cmp, bool adaptive){
     // Load the grid.
     int i0, j0, i1, j1;
     init_variables(grid_path, i0, j0, i1, j1);
@@ -242,6 +257,10 @@ bool run_search(string grid_path, function<bool (cell, cell)> cmp){
         // Could never get to the goal cell.
         if (tree[i1][j1] == make_pair(-1, -1)) return false;
 
+        // Update the h values
+        if (adaptive) update_h(i1, j1);
+
+        // Walk the path until blocked or reaching goal.
         vector<pair<int, int> > path = get_path(i1, j1);
         pair<int, int> last_walked_cell = walk_path(path);
         i0 = last_walked_cell.first; j0 = last_walked_cell.second;
