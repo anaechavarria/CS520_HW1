@@ -23,11 +23,22 @@ bool cmp_larger_g(const cell &a, const cell &b){
 // Runtime, number of expanded cells.
 // Explain what is observed an a reason for the observation.
 
+// Part 3
+// Compare repeated forward with repeated backward.
+// Break ties in favor of cells with larger g values.
+// Runtime, number of expanded cells.
+// Explain what is observed an a reason for the observation.
+
+// Part 5
+// Compare repeated forward and adaptive A*
+// Break ties in favor of cells with larger g values.
+// Runtime, number of expanded cells.
 
 int main(){
     for (int i = 0; i <  7; ++i){
         char filename[50];
-        sprintf(filename, "test_input/test_%02d.in", i );
+        //sprintf(filename, "test_input/test_%02d.in", i );
+        sprintf(filename, "input/grid_%02d.in", i+1 );
 
         printf("Computing file %s\n", filename);
 
