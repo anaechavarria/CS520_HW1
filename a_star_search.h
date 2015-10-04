@@ -6,6 +6,6 @@
 #include "cell_priority_queue.h"
 
 // Return true iff the goal cell can be reached from the start cell.
-bool run_search(string grid_path, function<bool (cell, cell)> cmp, bool adaptive);
+bool run_search(string grid_path, function<bool (cell, cell)> cmp, bool forward, bool adaptive);
 
 #endif

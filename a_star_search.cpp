@@ -248,11 +248,15 @@ pair<int, int> walk_path(vector< pair<int,int> > path){
 // Return true iff the goal cell can be reached from the start cell.
 // grid_path: is the path of the input grid (and start and target cells).
 // cmp: is the cell comparison function to use.
+// forward: is true if the search is forward (from agent to goal) and false if
+//          it is backward (from goal to agent).
 // adaptive: is true iff the search is an adaptive A* search.
-bool run_search(string grid_path, function<bool (cell, cell)> cmp, bool adaptive){
+bool run_search(string grid_path, function<bool (cell, cell)> cmp, bool forward, bool adaptive){
     // Load the grid.
     int i0, j0, i1, j1;
-    init_variables(grid_path, i0, j0, i1, j1);
+    if (forward) init_variables(grid_path, i0, j0, i1, j1);
+    else init_variables(grid_path, i1, j1, i0, j0);
+
 
     // The agent know the cell it is in and its neighboring cells.
     explored_grid[i0][j0] = actual_grid[i0][j0];

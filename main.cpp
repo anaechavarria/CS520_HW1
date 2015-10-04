@@ -43,11 +43,30 @@ int main(){
         printf("Computing file %s\n", filename);
 
         printf("Adaptive: ");
-        if (run_search(filename, cmp_smaller_g, true)) printf("Goal reached!\n");
+        if (run_search(filename, cmp_smaller_g, true, true)) printf("Goal reached!\n");
         else printf("There is no path\n");
 
         printf("Regular:  ");
-        if (run_search(filename, cmp_smaller_g, false)) printf("Goal reached!\n");
+        if (run_search(filename, cmp_smaller_g, true, false)) printf("Goal reached!\n");
+        else printf("There is no path\n");
+
+    }
+
+    printf("\n\n");
+
+    for (int i = 0; i <  7; ++i){
+        char filename[50];
+        // sprintf(filename, "test_input/test_%02d.in", i );
+        sprintf(filename, "input/grid_%02d.in", i+1 );
+
+        printf("Computing file %s\n", filename);
+
+        printf("Forward: ");
+        if (run_search(filename, cmp_smaller_g, true, false)) printf("Goal reached!\n");
+        else printf("There is no path\n");
+
+        printf("Backward:  ");
+        if (run_search(filename, cmp_smaller_g, false, false)) printf("Goal reached!\n");
         else printf("There is no path\n");
 
     }
