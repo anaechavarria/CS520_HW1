@@ -18,6 +18,11 @@ bool cmp_larger_g(const cell &a, const cell &b){
     return a.f() < b.f();
 }
 
+// Part 2
+// Compare tie breaking with cells of smaller g values and larger g values.
+// Runtime, number of expanded cells.
+// Explain what is observed an a reason for the observation.
+
 
 int main(){
     for (int i = 0; i <  7; ++i){
@@ -33,6 +38,7 @@ int main(){
         printf("Regular:  ");
         if (run_search(filename, cmp_smaller_g, false)) printf("Goal reached!\n");
         else printf("There is no path\n");
+
     }
 
     return 0;

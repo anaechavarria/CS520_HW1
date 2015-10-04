@@ -29,6 +29,14 @@ pair <int, int> tree[MAXN][MAXN]; // The cell where we came from in the search.
 int n; // The size of the grid.
 
 
+// Statistics.
+// The total number of cells inserted in the closed list among all searches.
+int num_of_cells_expanded;
+// The number of searches performed before finishing.
+int num_of_searches;
+// The total number of cells that the agent had to move.
+int num_of_moves;
+
 // Returns the manhattan distance from cell (i0, j0) to cell (i1, j1).
 int manhattan_distance(int i0, int j0, int i1, int j1){
     return abs(i1 - i0) + abs(j1 - j0);
@@ -87,6 +95,10 @@ void init_variables(string grid_path, int &i0, int &j0, int &i1, int &j1){
         }
     }
     closed.clear();
+
+    // Reset the statistics.
+    num_of_cells_expanded = num_of_searches = num_of_moves = 0;
+
 }
 
 // Reset the variables in between searches.
@@ -227,6 +239,8 @@ pair<int, int> walk_path(vector< pair<int,int> > path){
         }
         explored_grid[i][j] = actual_grid[i][j];
         explore_neighbors(i, j);
+
+        num_of_moves++;
     }
     return path.back();
 }
@@ -254,8 +268,11 @@ bool run_search(string grid_path, function<bool (cell, cell)> cmp, bool adaptive
 
         compute_path(open, i0, j0, i1, j1, search_count);
 
+        num_of_cells_expanded += closed.size();
+        num_of_searches++;
+
         // Could never get to the goal cell.
-        if (tree[i1][j1] == make_pair(-1, -1)) return false;
+        if (tree[i1][j1] == make_pair(-1, -1)) break;
 
         // Update the h values
         if (adaptive) update_h(i1, j1);
@@ -273,7 +290,12 @@ bool run_search(string grid_path, function<bool (cell, cell)> cmp, bool adaptive
             printf("Walked until (%d, %d)\n", i0, j0);
         }
     }
-    // Goal cell could be reached.
-    assert ((i0 == i1) and (j0 == j1));
-    return true;
+
+    // Print the search statistics.
+    printf("num_of_cells_expanded = %d, num_of_searches = %d, num_of_moves = %d\n",
+        num_of_cells_expanded, num_of_searches, num_of_moves);
+
+    // Return ig the goal cell could be reached.
+    return ((i0 == i1) and (j0 == j1));
+
 }
