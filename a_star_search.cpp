@@ -4,10 +4,11 @@
 #include <vector>
 #include <string>
 #include <cassert>
+#include <iterator>
 #include "a_star_search.h"
 using namespace std;
 
-#define debug true
+#define debug false
 
 const int MAXN = 105;
 const int INF = 10000000;
@@ -167,6 +168,17 @@ void compute_path(PriorityQueue &open, const int start_i, const int start_j,
     }
 }
 
+// Update the values of h to be h(s) = g(goal) - g(s) if s was a closed cell.
+// (i1, j1) are the coordinates of the goal cell.
+void update_h(int i1, int j1){
+    for (set<pair<int, int> >::iterator it = closed.begin(); it != closed.end(); ++it){
+        int i = it->first;
+        int j = it->second;
+        h[i][j] = g[i1][j1] - g[i][j];;
+    }
+}
+
+
 // Explore the neighbors of the cell (i, j). It updates the values of the
 // neighbors in the explored grid to match the values in the actual grid.
 void explore_neighbors(int i, int j){
@@ -220,7 +232,10 @@ pair<int, int> walk_path(vector< pair<int,int> > path){
 }
 
 // Return true iff the goal cell can be reached from the start cell.
-bool run_search(string grid_path, function<bool (cell, cell)> cmp){
+// grid_path: is the path of the input grid (and start and target cells).
+// cmp: is the cell comparison function to use.
+// adaptive: is true iff the search is an adaptive A* search.
+bool run_search(string grid_path, function<bool (cell, cell)> cmp, bool adaptive){
     // Load the grid.
     int i0, j0, i1, j1;
     init_variables(grid_path, i0, j0, i1, j1);
@@ -241,6 +256,9 @@ bool run_search(string grid_path, function<bool (cell, cell)> cmp){
 
         // Could never get to the goal cell.
         if (tree[i1][j1] == make_pair(-1, -1)) return false;
+
+        // Update the h values
+        if (adaptive) update_h(i1, j1);
 
         vector<pair<int, int> > path = get_path(i1, j1);
         pair<int, int> last_walked_cell = walk_path(path);

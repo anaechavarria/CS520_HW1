@@ -20,8 +20,20 @@ bool cmp_larger_g(const cell &a, const cell &b){
 
 
 int main(){
-    if (run_search("test_input/test_00.in", cmp_smaller_g)) printf("Goal reached!\n");
-    else printf("There is no path\n");
+    for (int i = 0; i <  7; ++i){
+        char filename[50];
+        sprintf(filename, "test_input/test_%02d.in", i );
+
+        printf("Computing file %s\n", filename);
+
+        printf("Adaptive: ");
+        if (run_search(filename, cmp_smaller_g, true)) printf("Goal reached!\n");
+        else printf("There is no path\n");
+
+        printf("Regular:  ");
+        if (run_search(filename, cmp_smaller_g, false)) printf("Goal reached!\n");
+        else printf("There is no path\n");
+    }
 
     return 0;
 }
