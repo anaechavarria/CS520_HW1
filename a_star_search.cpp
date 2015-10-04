@@ -260,6 +260,7 @@ bool run_search(string grid_path, function<bool (cell, cell)> cmp, bool adaptive
         // Update the h values
         if (adaptive) update_h(i1, j1);
 
+        // Walk the path until blocked or reaching goal.
         vector<pair<int, int> > path = get_path(i1, j1);
         pair<int, int> last_walked_cell = walk_path(path);
         i0 = last_walked_cell.first; j0 = last_walked_cell.second;
