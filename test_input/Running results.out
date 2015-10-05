@@ -1,0 +1,32 @@
+Breaking ties in favor of smaller g.
+num_of_cells_expanded = 45, num_of_searches = 3, num_of_moves = 15
+Running time:0.0023
+num_of_cells_expanded = 43, num_of_searches = 5, num_of_moves = 13
+Running time:0.0031
+num_of_cells_expanded = 10, num_of_searches = 2, num_of_moves = 9
+Running time:0.0013
+num_of_cells_expanded = 42, num_of_searches = 4, num_of_moves = 15
+Running time:0.0024
+num_of_cells_expanded = 1, num_of_searches = 1, num_of_moves = 2
+Running time:0.0007
+num_of_cells_expanded = 0, num_of_searches = 0, num_of_moves = 0
+Running time:0.0001
+num_of_cells_expanded = 26, num_of_searches = 2, num_of_moves = 12
+Running time:0.0013
+
+
+Breaking ties in favor of larger g.
+num_of_cells_expanded = 43, num_of_searches = 4, num_of_moves = 16
+Running time:0.0025
+num_of_cells_expanded = 29, num_of_searches = 4, num_of_moves = 12
+Running time:0.0024
+num_of_cells_expanded = 9, num_of_searches = 2, num_of_moves = 9
+Running time:0.0012
+num_of_cells_expanded = 35, num_of_searches = 4, num_of_moves = 15
+Running time:0.0024
+num_of_cells_expanded = 1, num_of_searches = 1, num_of_moves = 2
+Running time:0.0007
+num_of_cells_expanded = 0, num_of_searches = 0, num_of_moves = 0
+Running time:0.0001
+num_of_cells_expanded = 23, num_of_searches = 2, num_of_moves = 12
+Running time:0.0012
