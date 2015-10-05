@@ -18,21 +18,57 @@ bool cmp_larger_g(const cell &a, const cell &b){
     return a.f() < b.f();
 }
 
+// Part 2
+// Compare tie breaking with cells of smaller g values and larger g values.
+// Runtime, number of expanded cells.
+// Explain what is observed an a reason for the observation.
+
+// Part 3
+// Compare repeated forward with repeated backward.
+// Break ties in favor of cells with larger g values.
+// Runtime, number of expanded cells.
+// Explain what is observed an a reason for the observation.
+
+// Part 5
+// Compare repeated forward and adaptive A*
+// Break ties in favor of cells with larger g values.
+// Runtime, number of expanded cells.
 
 int main(){
     for (int i = 0; i <  7; ++i){
         char filename[50];
-        sprintf(filename, "test_input/test_%02d.in", i );
+        //sprintf(filename, "test_input/test_%02d.in", i );
+        sprintf(filename, "input/grid_%02d.in", i+1 );
 
         printf("Computing file %s\n", filename);
 
         printf("Adaptive: ");
-        if (run_search(filename, cmp_smaller_g, true)) printf("Goal reached!\n");
+        if (run_search(filename, cmp_smaller_g, true, true)) printf("Goal reached!\n");
         else printf("There is no path\n");
 
         printf("Regular:  ");
-        if (run_search(filename, cmp_smaller_g, false)) printf("Goal reached!\n");
+        if (run_search(filename, cmp_smaller_g, true, false)) printf("Goal reached!\n");
         else printf("There is no path\n");
+
+    }
+
+    printf("\n\n");
+
+    for (int i = 0; i <  7; ++i){
+        char filename[50];
+        // sprintf(filename, "test_input/test_%02d.in", i );
+        sprintf(filename, "input/grid_%02d.in", i+1 );
+
+        printf("Computing file %s\n", filename);
+
+        printf("Forward: ");
+        if (run_search(filename, cmp_smaller_g, true, false)) printf("Goal reached!\n");
+        else printf("There is no path\n");
+
+        printf("Backward:  ");
+        if (run_search(filename, cmp_smaller_g, false, false)) printf("Goal reached!\n");
+        else printf("There is no path\n");
+
     }
 
     return 0;
