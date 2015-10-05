@@ -11,7 +11,7 @@ using namespace std;
 #define debug false
 
 const int MAXN = 105;
-const int INF = 10000000;
+const int INF = 1000000000;
 
 // The possible values for the cells in the grid.
 enum { UNBLOCKED = 0, BLOCKED = 1, UNEXPLORED = -1};
@@ -20,10 +20,10 @@ int explored_grid[MAXN][MAXN]; // The status of the grid explored so far.
 int actual_grid[MAXN][MAXN]; // The actual status of the grid.
 
 int g[MAXN][MAXN]; // The lowest known cost for the given cell.
-int h[MAXN][MAXN]; // The value of h for each of the cells.
+int h[MAXN][MAXN]; // The value of the heuristic the given cell.
 int last_iter_searched[MAXN][MAXN]; // Last iter where the cost was updated.
 
-set<pair<int, int> > closed; // The set of the cells that have been visited.
+set<pair<int, int> > closed; // The set of the cells that have been expanded.
 pair <int, int> tree[MAXN][MAXN]; // The cell where we came from in the search.
 
 int n; // The size of the grid.
@@ -36,6 +36,7 @@ int num_of_cells_expanded;
 int num_of_searches;
 // The total number of cells that the agent had to move.
 int num_of_moves;
+
 
 // Returns the manhattan distance from cell (i0, j0) to cell (i1, j1).
 int manhattan_distance(int i0, int j0, int i1, int j1){
@@ -66,7 +67,6 @@ int load_grid(string grid_path, int &i0, int &j0, int &i1, int &j1){
     freopen(grid_path.c_str(), "r", stdin);
 
     int grid_size;
-
     cin >> grid_size;
     cin >> i0 >> j0 >> i1 >> j1;
 
@@ -164,11 +164,9 @@ void compute_path(PriorityQueue &open, const int start_i, const int start_j,
                 int next_h = h[next_i][next_j];
                 // It the solution improves the best know solution
                 if (g[next_i][next_j] > next_g){
-
-                    // Update valuw of best know solution.
+                    // Update value of best know solution.
                     g[next_i][next_j] = next_g;
-
-                    // Udate tree.
+                    // Update tree.
                     tree[next_i][next_j] = make_pair(cur.i, cur.j);
                     // Add cell to open queue.
                     cell next = cell(next_i, next_j, next_g, next_h);
@@ -183,10 +181,11 @@ void compute_path(PriorityQueue &open, const int start_i, const int start_j,
 // Update the values of h to be h(s) = g(goal) - g(s) if s was a closed cell.
 // (i1, j1) are the coordinates of the goal cell.
 void update_h(int i1, int j1){
-    for (set<pair<int, int> >::iterator it = closed.begin(); it != closed.end(); ++it){
+    set<pair<int, int> >::iterator it;
+    for (it = closed.begin(); it != closed.end(); ++it){
         int i = it->first;
         int j = it->second;
-        h[i][j] = g[i1][j1] - g[i][j];;
+        h[i][j] = g[i1][j1] - g[i][j];
     }
 }
 
@@ -251,34 +250,36 @@ pair<int, int> walk_path(vector< pair<int,int> > path){
 // forward: is true if the search is forward (from agent to goal) and false if
 //          it is backward (from goal to agent).
 // adaptive: is true iff the search is an adaptive A* search.
-bool run_search(string grid_path, function<bool (cell, cell)> cmp, bool forward, bool adaptive){
+bool run_search(string grid_path, function<bool (cell, cell)> cmp,
+                bool forward, bool adaptive){
     // Load the grid.
     int i0, j0, i1, j1;
     if (forward) init_variables(grid_path, i0, j0, i1, j1);
     else init_variables(grid_path, i1, j1, i0, j0);
 
-
     // The agent know the cell it is in and its neighboring cells.
     explored_grid[i0][j0] = actual_grid[i0][j0];
     explore_neighbors(i0, j0);
 
+    // Begin the searches.
     for (int search_count = 1; (i0 != i1) or (j0 != j1); search_count++){
+        // Reset variables before search.
         reset_variables(i0, j0);
-
         last_iter_searched[i0][j0] = last_iter_searched[i1][j1] = search_count;
 
+        // Run the search
         PriorityQueue open = PriorityQueue(cmp);
         assert(open.empty() and closed.empty());
-
         compute_path(open, i0, j0, i1, j1, search_count);
 
+        // Update statistics.
         num_of_cells_expanded += closed.size();
         num_of_searches++;
 
         // Could never get to the goal cell.
         if (tree[i1][j1] == make_pair(-1, -1)) break;
 
-        // Update the h values
+        // Update the heuristic values.
         if (adaptive) update_h(i1, j1);
 
         // Walk the path until blocked or reaching goal.
@@ -299,7 +300,7 @@ bool run_search(string grid_path, function<bool (cell, cell)> cmp, bool forward,
     printf("num_of_cells_expanded = %7d, num_of_searches = %4d, num_of_moves = %4d",
         num_of_cells_expanded, num_of_searches, num_of_moves);
 
-    // Return ig the goal cell could be reached.
+    // Return if the goal cell could be reached.
     return ((i0 == i1) and (j0 == j1));
 
 }

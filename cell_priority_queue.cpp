@@ -40,13 +40,6 @@ void PriorityQueue::push(cell c){
         swap(tree[i], tree[parent(i)]);
         i = parent(i);
     }
-
-    // TODO Remove this code for final set up.
-    // printf("Tree after push: ");
-    // for (int j = 0; j < size; ++j){
-    //     printf("%d ", tree[j].f());
-    // }
-    // printf("\n");
 }
 
 // Pop the smallest element from the queue and return it.
@@ -54,7 +47,6 @@ cell PriorityQueue::pop(){
     assert(size > 0);
 
     cell popped_cell = tree[0];
-
     // Put the last cell in the root.
     tree[0] = tree[--size];
 
@@ -70,10 +62,8 @@ cell PriorityQueue::pop(){
 
         // If left child is less than best seen cell.
         if (left < size and comp(tree[left], tree[min_index])) min_index = left;
-
         // If right child is less than best seen cell.
         if (right < size and comp(tree[right], tree[min_index])) min_index = right;
-
         // If the parent is greater than its smallest child, swap and recurr.
         // Otherwise stop because the tree is balanced.
         if (min_index != i){
@@ -83,13 +73,6 @@ cell PriorityQueue::pop(){
         }
     } while(swapped);
 
-    // TODO Remove this code for final set up.
-    // printf("Tree after pop: ");
-    // for (int j = 0; j < size; ++j){
-    //     printf("%d ", tree[j].f());
-    // }
-    // printf("\n");
-
     return popped_cell;
 }
 
@@ -98,6 +81,7 @@ bool PriorityQueue::compare(cell a, cell b){
     return comp(a, b);
 }
 
+// True iff the queue is empty.
 bool PriorityQueue::empty(){
     assert(size >= 0);
     return size == 0;

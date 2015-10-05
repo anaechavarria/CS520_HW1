@@ -65,9 +65,9 @@ void remove_cell_from_open_list(int i, int j){
     open_cells.erase(it);
 }
 
-// Cell (i, j) is unblocked. Recurr on the neighbors of (i, j) in a random order
+// Cell (i, j) is unblocked. Recur on the neighbors of (i, j) in a random order
 // moving two cells at a time.
-//Add randomization to create loops and separate components.
+// Add randomization to create loops and separate components.
 void build_cell(const int i, const int j){
     assert(grid[i][j] == UNBLOCKED);
 
@@ -84,7 +84,7 @@ void build_cell(const int i, const int j){
     // Make a random order of the neighbors.
     random_shuffle(neighbors.begin(), neighbors.end());
 
-    // Recurr on the neighbors in a random order.
+    // Recur on the neighbors in a random order.
     for (int k = 0; k < neighbors.size(); ++k){
 
         int next_i = neighbors[k].first;
@@ -112,12 +112,12 @@ void build_cell(const int i, const int j){
                 }
             }
 
-            // Recurr from the neighbor cell.
+            // Recur from the neighbor cell.
             build_cell(next_i, next_j);
 
             // Randlomly block the neighbor cell to create separate components.
             if ((rand() % 20) == 0) grid[next_i][next_j] = BLOCKED;
-        }else{ // At least one of the cells nor open.
+        }else{ // At least one of the cells not open.
             if (cell_open(next_i, next_j)){
                 grid[next_i][next_j] = BLOCKED;
             }

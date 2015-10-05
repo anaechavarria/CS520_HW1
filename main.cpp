@@ -4,7 +4,6 @@
 
 using namespace std;
 
-
 // True iff cell a is less than cell b.
 // Break ties in favor of the cell with the smaller g value.
 bool cmp_smaller_g(const cell &a, const cell &b){
@@ -19,11 +18,17 @@ bool cmp_larger_g(const cell &a, const cell &b){
     return a.f() < b.f();
 }
 
+// Returns the time elapsed form start to end (in seconds).
 double get_excecution_time(clock_t start, clock_t end){
     return 1.0 * (end - start) / CLOCKS_PER_SEC;
 }
 
-void run_search_on_all_inputs(function<bool (cell, cell)> cmp, bool forward, bool adaptive){
+// Run the search on all the input files.
+// cmp: The comparison function.
+// forward: If true, do forward search, if false do backward search.
+// adaptive: If true, do adaptive search, if false do regular search.
+void run_search_on_all_inputs(function<bool (cell, cell)> cmp, bool forward,
+                              bool adaptive){
     for (int i = 0; i < 50; ++i){
         char filename[50];
 
@@ -37,7 +42,12 @@ void run_search_on_all_inputs(function<bool (cell, cell)> cmp, bool forward, boo
     }
 }
 
-void run_search_on_all_tests(function<bool (cell, cell)> cmp, bool forward, bool adaptive){
+// Run the search on all the test files.
+// cmp: The comparison function.
+// forward: If true, do forward search, if false do backward search.
+// adaptive: If true, do adaptive search, if false do regular search.
+void run_search_on_all_tests(function<bool (cell, cell)> cmp, bool forward,
+                              bool adaptive){
     for (int i = 0; i < 7; ++i){
         char filename[50];
 
@@ -51,11 +61,8 @@ void run_search_on_all_tests(function<bool (cell, cell)> cmp, bool forward, bool
     }
 }
 
-
 // Part 2
 // Compare tie breaking with cells of smaller g values and larger g values.
-// Runtime, number of expanded cells.
-// Explain what is observed an a reason for the observation.
 void run_part_2(){
     printf("Breaking ties in favor of smaller g.\n");
     run_search_on_all_inputs(cmp_smaller_g, true, false);
@@ -69,8 +76,6 @@ void run_part_2(){
 // Part 3
 // Compare repeated forward with repeated backward.
 // Break ties in favor of cells with larger g values.
-// Runtime, number of expanded cells.
-// Explain what is observed an a reason for the observation.
 void run_part_3(){
     printf("Forward A*.\n");
     run_search_on_all_inputs(cmp_larger_g, true, false);
@@ -84,7 +89,6 @@ void run_part_3(){
 // Part 5
 // Compare repeated forward and adaptive A*
 // Break ties in favor of cells with larger g values.
-// Runtime, number of expanded cells.
 void run_part_5(){
     printf("Regular A*.\n");
     run_search_on_all_inputs(cmp_larger_g, true, false);
@@ -95,13 +99,13 @@ void run_part_5(){
     run_search_on_all_inputs(cmp_larger_g, true, true);
 }
 
+
 int main(){
     run_part_2();
     printf("\n\n");
     run_part_3();
     printf("\n\n");
     run_part_5();
-
     return 0;
 }
 
