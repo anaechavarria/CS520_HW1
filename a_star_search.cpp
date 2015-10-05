@@ -296,7 +296,7 @@ bool run_search(string grid_path, function<bool (cell, cell)> cmp, bool forward,
     }
 
     // Print the search statistics.
-    printf("num_of_cells_expanded = %d, num_of_searches = %d, num_of_moves = %d\n",
+    printf("num_of_cells_expanded = %7d, num_of_searches = %4d, num_of_moves = %4d",
         num_of_cells_expanded, num_of_searches, num_of_moves);
 
     // Return ig the goal cell could be reached.
