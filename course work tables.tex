@@ -1,0 +1,75 @@
+\documentclass{article}
+\usepackage[margin=0.5in]{geometry} % Reduce margin size.
+\usepackage{url}
+
+% Don't indent any paragraph
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\title{CS $520$ Introduction to Artificial Intelligence \\ Homework 1 }
+\date{October 12, 2015}
+\author{Malike Alikhani \\ \small{(netid: ma1195)} \and Ana Echavarría Uribe \\ \small{(RUID: 167007648)}}
+
+\maketitle
+
+\section*{Part 0}
+We designed and algorithm to create a maze like structure based on the algorithm presented in (\url{\http://www.migapro.com/depth-first-search/}) but with certain modifications. The idea is that when running a depth first search from a given cell select randomly one of its unseen neighbors that are two cells away in any direction (north, south, east or west). Move to that cell but blocking all of the unseen neighbors of the intermediate cell (the cell in between the current cell and the selected neighbor). This creates a maze like structure with no loops and one connected component.\\
+Now, in order to add loops and creating more than one connected component we simply set random blocked cells as unblocked and random unblocked cells as blocked.
+
+\section*{Part 2}
+
+The repeated forward A* was executed on 50 grid of size $101 \times 101$ using two different rules for selecting the next cell to expand when their $f = g + h$ value is the same: selecting the cell with the smaller $g$ value or with the larger value of $g$. The average number of cells expanded, searches (repetitions of the A* search), number of cells the agent moves and running time are shown in results in table~\ref{tab:comp_g}.
+
+\begin{table}[h]
+  \begin{center}
+    \begin{tabular}{|*{5}{c|}}
+      \cline{2-5}
+      \multicolumn{1}{c|}{} & Num cells expanded & Num searches & Num moves & Running time (sec) \\ \hline
+      Smaller g & 66,695  & 97 & 385 & 0.1608\\ \hline 
+      Larger g & 8,164  & 95 & 376 & 0.0939 \\ \hline \hline
+      Ratio Smaller/Larger & 8.1699&1.0185&1.0240&1.7124 \\ \hline
+    \end{tabular}
+  \end{center}
+  \caption{Average statistics when running on 50 grids and breaking ties in favor of larger and smaller values of g.}
+  \label{tab:comp_g}
+\end{table}
+
+It can be seen that, on average, the number of cells expanded when selecting the cell with the smaller value of $g$ is more than 8 times higher than the number of cells expanded when selecting the cells with the larger value of $g$. The running time, nonetheless is not 8 times higher; this could be because the time overhead of starting a search is so big that the ratio in the running time is only 1.7 times higher even if the search is doing 8 times the work.\\
+This difference in the number of cells expanded could be due to the fact than selecting a cell with a smaller $g$ rather than a cell with a larger $g$ implies that we are favoring the cell with the largest $h$ value. Since the $h$ value is a lower bound on the number of steps from that cell to the target, the cell that is being expanded is possibly farther away from the target than the other cell is. This could in the long run make us explore all the neighbors of that cell which are farther away and are not getting us to closer to the target.
+
+\section*{Part 3}
+
+The algorithms for the forward and backward A* were executed on the same 50 grids of size $101 \times 101$ and using the same initial cell for the agent and for the target cell. The results in terms of the average number of expanded cells, number of searches, number of moves of the agent and running time, along with the ratio comparison of these values are shown in table~ \ref{tab:back_for}.
+
+\begin{table}[h]
+  \begin{center}
+    \begin{tabular}{|*{5}{c|}}
+      \cline{2-5}
+      \multicolumn{1}{c|}{} & Num cells expanded & Num searches & Num moves & Running time (sec) \\ \hline
+      Backward A* & 455,896 & 96 & 373 & 0.7797\\ \hline 
+      Forward A*  & 8,164  & 95 & 376 & 0.0879 \\ \hline \hline
+      Ratio Backward/Forward & 55.845 & 1.0103 & 0.9923 & 8.8687 \\ \hline
+    \end{tabular}
+  \end{center}
+  \caption{Average statistics when running on 50 grids and running backward and forward A*.}
+  \label{tab:back_for}
+\end{table}
+
+
+\begin{table}[h]
+  \begin{center}
+    \begin{tabular}{|*{5}{c|}}
+      \cline{2-5}
+      \multicolumn{1}{c|}{} & Num cells expanded & Num searches & Num moves & Running time (sec) \\ \hline
+      Adaptive A* & 6,062 & 96 & 378 & 0.0886\\ \hline 
+      Repeated A*  & 8,164  & 95 & 376 & 0.0893 \\ \hline \hline
+      Ration Adaptive A*/Repeated A* & 0.7426 & 1.0078 & 1.0068 & 0.9923 \\ \hline
+    \end{tabular}
+  \end{center}
+  \caption{Average statistics when running on 50 grids and running Repeated A* and adaptive A*.}
+\end{table}
+
+
+
+\end{document}
