@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage[margin=0.5in]{geometry} % Reduce margin size.
+\usepackage[margin=2.3cm]{geometry} % Reduce margin size.
 \usepackage{url}
 
 % Don't indent any paragraph
@@ -14,8 +14,12 @@
 \maketitle
 
 \section*{Part 0}
+
 We designed and algorithm to create a maze like structure based on the algorithm presented in (\url{\http://www.migapro.com/depth-first-search/}) but with certain modifications. The idea is that when running a depth first search from a given cell select randomly one of its unseen neighbors that are two cells away in any direction (north, south, east or west). Move to that cell but blocking all of the unseen neighbors of the intermediate cell (the cell in between the current cell and the selected neighbor). This creates a maze like structure with no loops and one connected component.\\
 Now, in order to add loops and creating more than one connected component we simply set random blocked cells as unblocked and random unblocked cells as blocked.
+
+\section*{Part 1}
+TODO(Mali): Copy answer from other .tex (may need to include more packages)
 
 \section*{Part 2}
 
@@ -35,7 +39,7 @@ The repeated forward A* was executed on 50 grid of size $101 \times 101$ using t
   \label{tab:comp_g}
 \end{table}
 
-It can be seen that, on average, the number of cells expanded when selecting the cell with the smaller value of $g$ is more than 8 times higher than the number of cells expanded when selecting the cells with the larger value of $g$. The running time, nonetheless is not 8 times higher; this could be because the time overhead of starting a search is so big that the ratio in the running time is only 1.7 times higher even if the search is doing 8 times the work.\\
+It can be seen that, on average, the number of cells expanded when selecting the cell with the smaller value of $g$ is more than 8 times higher than the number of cells expanded when selecting the cells with the larger value of $g$. The running time, nonetheless is not 8 times higher; this could be because the time overhead of starting a search is so big that the ratio in the running time is only 1.7 times higher even if the search is doing 8 times the work. Additionally, we can see that in spite of the fact that the number of cells expanded is much larger, the algorithm still does around the same number of searches and the same number of moves for the agent; this would indicate that the number of cells expanded is larger for the tie breaking in favor of cells with smaller $g$ values because there are more cells being explored in every search rather than because there are more searches being done.\\
 This difference in the number of cells expanded could be due to the fact than selecting a cell with a smaller $g$ rather than a cell with a larger $g$ implies that we are favoring the cell with the largest $h$ value. Since the $h$ value is a lower bound on the number of steps from that cell to the target, the cell that is being expanded is possibly farther away from the target than the other cell is. This could in the long run make us explore all the neighbors of that cell which are farther away and are not getting us to closer to the target.
 
 \section*{Part 3}
@@ -56,6 +60,10 @@ The algorithms for the forward and backward A* were executed on the same 50 grid
   \label{tab:back_for}
 \end{table}
 
+\section*{Part 4}
+TODO(Mali): Copy answer from other .tex (may need to include more packages)
+
+\section*{Part 5}
 
 \begin{table}[h]
   \begin{center}
@@ -70,6 +78,7 @@ The algorithms for the forward and backward A* were executed on the same 50 grid
   \caption{Average statistics when running on 50 grids and running Repeated A* and adaptive A*.}
 \end{table}
 
-
+\section*{Part 6}
+TODO(Mali): Copy answer from other .tex (may need to include more packages)
 
 \end{document}
