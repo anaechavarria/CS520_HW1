@@ -6,3 +6,7 @@ course work.synctex.gz
 course work.aux
 
 course work.log
+
+*.aux
+
+*.log
