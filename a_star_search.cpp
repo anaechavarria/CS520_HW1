@@ -295,12 +295,13 @@ bool run_search(string grid_path, function<bool (cell, cell)> cmp,
             printf("Walked until (%d, %d)\n", i0, j0);
         }
     }
+    bool target_reached = (i0 == i1) and (j0 == j1);
 
     // Print the search statistics.
-    printf("num_of_cells_expanded = %7d, num_of_searches = %4d, num_of_moves = %4d",
-        num_of_cells_expanded, num_of_searches, num_of_moves);
+    printf("target_reached = %d, num_of_cells_expanded = %7d, num_of_searches = %4d, num_of_moves = %4d",
+        target_reached, num_of_cells_expanded, num_of_searches, num_of_moves);
 
     // Return if the goal cell could be reached.
-    return ((i0 == i1) and (j0 == j1));
+    return (target_reached);
 
 }
