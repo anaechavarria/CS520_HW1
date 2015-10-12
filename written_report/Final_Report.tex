@@ -58,26 +58,25 @@ Examples of $5 \times 5$ grids generated using this algorithm are:
   \end{center}
 \end{multicols}
 
-
-
-
-
 \section*{Part 1}
 \textbf{a.}\quad Since A* follows a path that has the lowest expected total cost, it will move to East rather than North to minimize the total expected cost. 
 
 $$g(\text{East})=1 \text{ and } h(\text{East}) = 2 \rightarrow f(\text{East})=1+2=3 $$
 $$ g(\text{North})=1 \text{ and } h(\text{North})=4 \rightarrow f(\text{North})=1+4=5 $$
 
-<<<<<<< HEAD
-b.The agent will not get stuck in an infinite loop because we do not visit a cell that has already been expanded in that iteration which means that every unblocked cell is expanded at most once. In this algorithm, we move that particular state to the closed list.\\
-Whenever the path traversed by the agent is blocked, we recompute a new path. This makes sure we cover all the unblocked cells in the grid that are reachable by the agent. Unless there are infinite number of cells, the agent (A* algorithm) would find the goal state or would discover it is impossible to reach the goal because the there is no new path that gets the agent to the goal.  Also, the number of searches is abounded above by the number of unblocked cells. Each unblocked cell was discovered at least one new cell and the total number of moves is bounded about by maximum number of moves multiply by number of searches which is less than number of unblocked cells multiply by number of searches. Therefore it is bounded above by the number of unblocked cells squared.
-=======
 \textbf{b.}\quad The agent will not get stuck in an infinite loop because we do not visit a cell that has already been expanded in that iteration which means that every unblocked cell is expanded at most once. In this algorithm, we move that particular state to the closed list.\\
-Whenever the path traversed by the agent is blocked, we recompute a new path. This makes sure we cover all the unblocked cells in the grid that are reachable by the agent. Unless there are infinite number of cells, the agent (A* algorithm) would find the goal state or would discover it is impossible to reach the goal because the there is no new path that gets the agent to the goal.
->>>>>>> origin/master
+Whenever the path traversed by the agent is blocked, we recompute a new path. This makes sure we cover all the unblocked cells in the grid that are reachable by the agent. Unless there are infinite number of cells, the agent (A* algorithm) would find the goal state or would discover it is impossible to reach the goal because the there is no new path that gets the agent to the goal.\\
+Also, the number of searches is abounded above by the number of unblocked cells. In each search, there is at least one new unblocked cell discovered so the total number of searches is bounded above by the total number of cells. Additionally, in each search the agent can move to each unblocked cell at most once (there are no loops in the moves) so the total number of moves is:
+\begin{align*}
+  \text{number of moves} &= \sum_{i = 0}^{\text{num of searches}} \text{number of moves in search } i\\
+                         &\leq \text{maximum number of searches} \times \text{maximum number of moves in each search}\\
+                         &= \text{number of unblocked cells} \times \text{number of unblocked cells}\\
+                         &= \text{number of unblocked cells}^2\\
+\end{align*}
 
-{\huge{WE ARE MISSING THE BOUND PROOF}}
+ Each unblocked cell was discovered at least once so th
 
+and the total number of moves is bounded above by the maximum number of cells multiplied by number of searches which is less than number of unblocked cells multiply by number of searches. Therefore it is bounded above by the number of unblocked cells squared.
 
 \section*{Part 2}
 
