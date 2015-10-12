@@ -1,6 +1,12 @@
 \documentclass{article}
 \usepackage[margin=2.3cm]{geometry} % Reduce margin size.
 \usepackage{url}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage[table]{xcolor}
+\usepackage{multicol}
+
+
 
 % Don't indent any paragraph
 \setlength{\parindent}{0pt}
@@ -9,7 +15,7 @@
 
 \title{CS $520$ Introduction to Artificial Intelligence \\ Homework 1 }
 \date{October 12, 2015}
-\author{Malike Alikhani \\ \small{(RUID: 167001652)} \and Ana Echavarri­a Uribe \\ \small{(RUID: 167007648)}}
+\author{Malike Alikhani \\ \small{(RUID: 167001652)} \and Ana Echavarria Uribe \\ \small{(RUID: 167007648)}}
 
 \maketitle
 
@@ -17,23 +23,67 @@
 
 We designed and algorithm to create a maze like structure based on the algorithm presented in (\url{\http://www.migapro.com/depth-first-search/}) but with certain modifications. The idea is that when running a depth first search from a given cell select randomly one of its unseen neighbors that are two cells away in any direction (north, south, east or west). Move to that cell but blocking all of the unseen neighbors of the intermediate cell (the cell in between the current cell and the selected neighbor). This creates a maze like structure with no loops and one connected component.\\
 Now, in order to add loops and creating more than one connected component we simply set random blocked cells as unblocked and random unblocked cells as blocked.
+Examples of $5 \times 5$ grids generated using this algorithm are:
+
+\newcommand{\bl}{\cellcolor{black!100}}
+\begin{multicols}{2}
+  \begin{center}
+    % #.#.#
+    % #.#.#
+    % ...##
+    % #.##.
+    % #...#
+    \begin{tabular}{|*{5}{c|}}
+      \hline
+      \bl & & \bl & & \bl \\ \hline
+      \bl & & \bl & & \bl \\ \hline
+      & & & \bl & \bl \\ \hline
+      \bl &  & \bl & \bl & \\ \hline
+      \bl & & & & \bl \\ \hline
+    \end{tabular}
+    
+    \begin{tabular}{|*{5}{c|}}
+      \hline
+      & \bl & \bl & & \bl \\ \hline
+      & & & \bl & \bl \\ \hline
+      & \bl & & &  \\ \hline
+      &  &  & \bl & \\ \hline
+      & \bl & \bl & \bl & \bl \\ \hline
+    \end{tabular}
+    % .##.#
+    % ...##
+    % .#...
+    % ...#.
+    % .####
+  \end{center}
+\end{multicols}
+
+
+
+
 
 \section*{Part 1}
-a. Since A* follows a path that has the lowest expected total cost, it will move to East rather than North to minimize the total expected cost. 
+\textbf{a.}\quad Since A* follows a path that has the lowest expected total cost, it will move to East rather than North to minimize the total expected cost. 
 
-$$g(East)=1, h(East)=2 \rightarrow f(East)=1+2=3 $$
-$$ g(North)=1, h(North)=4 \rightarrow f(North)=1+4=5 $$
+$$g(\text{East})=1 \text{ and } h(\text{East}) = 2 \rightarrow f(\text{East})=1+2=3 $$
+$$ g(\text{North})=1 \text{ and } h(\text{North})=4 \rightarrow f(\text{North})=1+4=5 $$
 
+<<<<<<< HEAD
 b.The agent will not get stuck in an infinite loop because we do not visit a cell that has already been expanded in that iteration which means that every unblocked cell is expanded at most once. In this algorithm, we move that particular state to the closed list.\\
 Whenever the path traversed by the agent is blocked, we recompute a new path. This makes sure we cover all the unblocked cells in the grid that are reachable by the agent. Unless there are infinite number of cells, the agent (A* algorithm) would find the goal state or would discover it is impossible to reach the goal because the there is no new path that gets the agent to the goal.  Also, the number of searches is abounded above by the number of unblocked cells. Each unblocked cell was discovered at least one new cell and the total number of moves is bounded about by maximum number of moves multiply by number of searches which is less than number of unblocked cells multiply by number of searches. Therefore it is bounded above by the number of unblocked cells squared.
+=======
+\textbf{b.}\quad The agent will not get stuck in an infinite loop because we do not visit a cell that has already been expanded in that iteration which means that every unblocked cell is expanded at most once. In this algorithm, we move that particular state to the closed list.\\
+Whenever the path traversed by the agent is blocked, we recompute a new path. This makes sure we cover all the unblocked cells in the grid that are reachable by the agent. Unless there are infinite number of cells, the agent (A* algorithm) would find the goal state or would discover it is impossible to reach the goal because the there is no new path that gets the agent to the goal.
+>>>>>>> origin/master
 
+{\huge{WE ARE MISSING THE BOUND PROOF}}
 
 
 \section*{Part 2}
 
 The repeated forward A* was executed on 50 grid of size $101 \times 101$ using two different rules for selecting the next cell to expand when their $f = g + h$ value is the same: selecting the cell with the smaller $g$ value or with the larger value of $g$. The average number of cells expanded, searches (repetitions of the A* search), number of cells the agent moves and running time are shown in results in table~\ref{tab:comp_g}.
 
-\begin{table}[h]
+\begin{table}[ht]
   \begin{center}
     \begin{tabular}{|*{5}{c|}}
       \cline{2-5}
