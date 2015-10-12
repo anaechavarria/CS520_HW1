@@ -4,7 +4,7 @@
 
 using namespace std;
 
-int num_inputs = 1;
+int num_inputs = 50;
 int num_tests = 7;
 
 // True iff cell a is less than cell b.
