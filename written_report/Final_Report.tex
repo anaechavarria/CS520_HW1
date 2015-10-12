@@ -127,7 +127,7 @@ From the proof, we have $$(B-G)+(A-B)=(A-B-G) \rightarrow (A-G)$$  by triangle i
 
 \section*{Part 5}
 The algorithms for the repeated forward A* and adaptive A* were executed on the same 50 grids of size $101 \times 101$ and using the same initial cell for the agent and for the target cell. The results in terms of the average number of expanded cells, number of searches, number of moves of the agent and running time, along with the ratio comparison of these values are shown in table~ \ref{tab:adaptive}.\\
-We can see that the time of both algorithms is roughly the same but the adaptive A* explores 75\% of number of cells explored by repeated forward A*. As discussed in part 2, we believe that the time overhead for the search is big enough that the time difference between both algorithms doesn't differ that much. For that reason, we decide to do the comparison in terms of hte number of explored cells rather than the running time.
+We can see that the time of both algorithms is roughly the same but the adaptive A* explores 75\% of number of cells explored by repeated forward A*. As discussed in part 2, we believe that the time overhead for the search is big enough that the time difference between both algorithms doesn't differ that much. For that reason, we decide to do the comparison in terms of the number of explored cells rather than the running time.
 
 \begin{table}[ht]
   \begin{center}
@@ -139,11 +139,11 @@ We can see that the time of both algorithms is roughly the same but the adaptive
       Ration Adaptive A*/Repeated A* & 0.7426 & 1.0078 & 1.0068 & 0.9923 \\ \hline
     \end{tabular}
   \end{center}
-  \caption{Average statistics when running on 50 grids and running Repeated A* and adaptive A*.}
+  \caption{Average statistics when running on 50 grids and running repeated A* and adaptive A*.}
   \label{tab:adaptive}
 \end{table}
 
-We know that adaptive A* increases the values of $h$ as the algorithm is executed to include the new cells that have been discovered and are blocked. This allows it to decide to expand cells that may have greater manhattan distance than other cells with the same $g$ value because the other cell's $h$ value was increased with the adaptive A*. This increase occurs because the previous searches have discovered that the actual distance from that cell to the target is greater than its manhattan distance given the current explored cells in the board. Now, this change in the $h$ value that changes the cells expanded makes us reach the target faster and that is why the Adaptive A* expands less cells than the repeated forward A*.
+We know that adaptive A* increases the values of $h$ as the algorithm is executed to include the new cells that have been discovered and are blocked. This allows it to decide to expand cells that may have greater manhattan distance than other cells with the same $g$ value because the other cell's $h$ value was increased with the adaptive A*. This increase occurs because the previous searches have discovered that the actual distance from that cell to the target is greater than its manhattan distance given the current explored cells in the board. Now, this change in the $h$ value that changes the cells expanded makes us reach the target faster and that is why the adaptive A* expands less cells than the repeated forward A*.
 
 \section*{Part 6}
 We suggest the following methods for decreasing the memory usage of our implementation. 
