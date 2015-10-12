@@ -118,11 +118,11 @@ We can see that when running the backward A* we explore on average 55 times more
 
 
 \section*{Part 4}
-Consider the coordinates of goal state G be $(G_x,G_y)$. Let cell A be $(x_1,y_1)$. The estimated path cost from cell A to goal G (A-G) is $$|G_x-x_1|+|G_y-y_1|.$$ Now assume the agent travels to the goal through a cell $B (x_2,y_2)$ which lies outside the path (A-G). The new path cost A-B-G is $$|G_x- x_2|+|Gy-y2|+|x_2-x_1|+|y_2-y_1|$$
-Compare the two path costs, A-G and A-B-G.
+Consider the coordinates of goal state G be $(G_x,G_y)$. Let cell A be $(x_1,y_1)$. The estimated path cost from cell $A$ to goal $G$ ($A-G$) is $$|G_x-x_1|+|G_y-y_1|.$$ Now assume the agent travels to the goal through a cell $B (x_2,y_2)$ which lies outside the path ($A-G$). The new path cost $A-B-G$ is $$|G_x- x_2|+|Gy-y2|+|x_2-x_1|+|y_2-y_1|$$
+Compare the two path costs, $A-G$ and $A-B-G$.
 \\
 $$|G_x-x_2|+|x_2-x_1| \rightarrow  |G_x-x_1|$$(This is always true for any 3 values) $$ |G_y-y_2|+|y_2-y_1|   \rightarrow |G_y-y_1|$$(This is also always true for any 3 values)
-Combining the two inequalities prove that estimated path cost $$(A-B-G) \rightarrow (A-G). $$So there can't be a shorter path to the goal through B. Therefore the initial path (A-G) estimated by the heuristic is the shortest path. Therefore Manhattan distances are consistent.
+Combining the two inequalities prove that estimated path cost $$(A-B-G) \rightarrow (A-G). $$So there can't be a shorter path to the goal through $B$. Therefore the initial path ($A-G$) estimated by the heuristic is the shortest path. Therefore Manhattan distances are consistent.
 From the proof, we have $$(B-G)+(A-B)=(A-B-G) \rightarrow (A-G)$$  by triangle inequality.
 
 \section*{Part 5}
