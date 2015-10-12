@@ -4,6 +4,9 @@
 
 using namespace std;
 
+int num_inputs = 1;
+int num_tests = 7;
+
 // True iff cell a is less than cell b.
 // Break ties in favor of the cell with the smaller g value.
 bool cmp_smaller_g(const cell &a, const cell &b){
@@ -29,7 +32,7 @@ double get_excecution_time(clock_t start, clock_t end){
 // adaptive: If true, do adaptive search, if false do regular search.
 void run_search_on_all_inputs(function<bool (cell, cell)> cmp, bool forward,
                               bool adaptive){
-    for (int i = 0; i < 50; ++i){
+    for (int i = 0; i < num_inputs; ++i){
         char filename[50];
 
         sprintf(filename, "input/grid_%02d.in", i + 1 );
@@ -48,7 +51,7 @@ void run_search_on_all_inputs(function<bool (cell, cell)> cmp, bool forward,
 // adaptive: If true, do adaptive search, if false do regular search.
 void run_search_on_all_tests(function<bool (cell, cell)> cmp, bool forward,
                               bool adaptive){
-    for (int i = 0; i < 7; ++i){
+    for (int i = 0; i < num_tests; ++i){
         char filename[50];
 
         sprintf(filename, "test_input/test_%02d.in", i );

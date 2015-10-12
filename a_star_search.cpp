@@ -288,6 +288,7 @@ bool run_search(string grid_path, function<bool (cell, cell)> cmp,
         i0 = last_walked_cell.first; j0 = last_walked_cell.second;
 
         if (debug){
+            printf("The path is ");
             for (int i = 0; i < path.size(); ++i){
                 printf("(%d, %d) ", path[i].first, path[i].second);
             }
