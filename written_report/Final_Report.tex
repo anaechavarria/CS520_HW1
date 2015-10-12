@@ -61,7 +61,7 @@ Examples of $5 \times 5$ grids generated using this algorithm are:
 \section*{Part 1}
 \textbf{a.}\quad Since A* follows a path that has the lowest expected total cost, it will move to East rather than North to minimize the total expected cost. 
 
-$$g(\text{East})=1 \text{ and } h(\text{East}) = 2 \rightarrow f(\text{East})=1+2=3 $$
+$$ g(\text{East})=1 \text{ and } h(\text{East}) = 2 \rightarrow f(\text{East})=1+2=3 $$
 $$ g(\text{North})=1 \text{ and } h(\text{North})=4 \rightarrow f(\text{North})=1+4=5 $$
 
 \textbf{b.}\quad The agent will not get stuck in an infinite loop because we do not visit a cell that has already been expanded in that iteration which means that every unblocked cell is expanded at most once. In this algorithm, we move that particular state to the closed list.\\
@@ -73,10 +73,6 @@ Also, the number of searches is abounded above by the number of unblocked cells.
                          &= \text{number of unblocked cells} \times \text{number of unblocked cells}\\
                          &= \text{number of unblocked cells}^2\\
 \end{align*}
-
- Each unblocked cell was discovered at least once so th
-
-and the total number of moves is bounded above by the maximum number of cells multiplied by number of searches which is less than number of unblocked cells multiply by number of searches. Therefore it is bounded above by the number of unblocked cells squared.
 
 \section*{Part 2}
 
@@ -103,7 +99,7 @@ This difference in the number of cells expanded could be due to the fact than se
 
 The algorithms for the forward and backward A* were executed on the same 50 grids of size $101 \times 101$ and using the same initial cell for the agent and for the target cell. The results in terms of the average number of expanded cells, number of searches, number of moves of the agent and running time, along with the ratio comparison of these values are shown in table~ \ref{tab:back_for}.
 
-\begin{table}[h]
+\begin{table}[ht]
   \begin{center}
     \begin{tabular}{|*{5}{c|}}
       \cline{2-5}
@@ -117,6 +113,10 @@ The algorithms for the forward and backward A* were executed on the same 50 grid
   \label{tab:back_for}
 \end{table}
 
+% Think about how many *known* obstacles are near the goal and near the starting point.
+We can see that when running the backward A* we explore on average 55 times more cells than with the forward A*. We can also see that because both algorithms do roughly the same number of searches, there are more cells being explored in each search with the backward algorithm than with the forward algorithm. This may be due to the fact that there are more blocked cells near the target than there are near the agent so each search needs to explore more cells to get from the target to the agent than the other way around.
+
+
 \section*{Part 4}
 Consider the coordinates of goal state G be $(G_x,G_y)$. Let cell A be $(x_1,y_1)$. The estimated path cost from cell A to goal G (A-G) is $$|G_x-x_1|+|G_y-y_1|.$$ Now assume the agent travels to the goal through a cell $B (x_2,y_2)$ which lies outside the path (A-G). The new path cost A-B-G is $$|G_x- x_2|+|Gy-y2|+|x_2-x_1|+|y_2-y_1|$$
 Compare the two path costs, A-G and A-B-G.
@@ -126,8 +126,10 @@ Combining the two inequalities prove that estimated path cost $$(A-B-G) \rightar
 From the proof, we have $$(B-G)+(A-B)=(A-B-G) \rightarrow (A-G)$$  by triangle inequality.
 
 \section*{Part 5}
+The algorithms for the repeated forward A* and adaptive A* were executed on the same 50 grids of size $101 \times 101$ and using the same initial cell for the agent and for the target cell. The results in terms of the average number of expanded cells, number of searches, number of moves of the agent and running time, along with the ratio comparison of these values are shown in table~ \ref{tab:adaptive}.\\
+We can see that the time of both algorithms is roughly the same but the adaptive A* explores 75\% of number of cells explored by repeated forward A*. As discussed in part 2, we believe that the time overhead for the search is big enough that the time difference between both algorithms doesn't differ that much. For that reason, we decide to do the comparison in terms of hte number of explored cells rather than the running time.
 
-\begin{table}[h]
+\begin{table}[ht]
   \begin{center}
     \begin{tabular}{|*{5}{c|}}
       \cline{2-5}
@@ -138,7 +140,10 @@ From the proof, we have $$(B-G)+(A-B)=(A-B-G) \rightarrow (A-G)$$  by triangle i
     \end{tabular}
   \end{center}
   \caption{Average statistics when running on 50 grids and running Repeated A* and adaptive A*.}
+  \label{tab:adaptive}
 \end{table}
+
+We know that adaptive A* increases the values of $h$ as the algorithm is executed to include the new cells that have been discovered and are blocked. This allows it to decide to expand cells that may have greater manhattan distance than other cells with the same $g$ value because the other cell's $h$ value was increased with the adaptive A*. This increase occurrs because the previous searches have discovered that the actual distance from that cell to the target is greater than its manhattan distance given the current explored cells in the board.
 
 \section*{Part 6}
 We suggest the following methods for decreasing the memory usage of our implementation. 
